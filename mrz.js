@@ -33,6 +33,8 @@ function findLines(text){
 
 function parseLines(a,b){
   var l1=a.slice(0,44);while(l1.length<44)l1+='<';
+  /* filler at the end of the name line is sometimes read as K/L */
+  l1=l1.slice(0,5)+l1.slice(5).replace(/[<KL]{5,}$/,function(m){return m.replace(/[KL]/g,'<')});
   var l2=b.slice(0,44);while(l2.length<44)l2+='<';
   var pnRaw=l2.slice(0,9),pnc=numfix(l2.charAt(9));
   var nat=alphafix(l2.slice(10,13)).replace(/</g,'');
