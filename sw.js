@@ -1,5 +1,5 @@
 /* Keeps a copy of the app so it opens fast and works without internet. Data itself syncs through Firebase. */
-const CACHE='zm-app-v10';
+const CACHE='zm-app-v11';
 self.addEventListener('install',()=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{
