@@ -372,6 +372,7 @@ span.num.ltr{white-space:nowrap}
   .svct td:nth-child(9)::before{content:"בדוקט ";color:var(--muted);font-size:12px}
   .svct td:nth-child(10)::before{content:"ספק: ";color:var(--muted);font-size:12px}
   .svct td:nth-child(11){grid-column:1/-1}
+  .svct td:nth-child(11)::before{content:"איך שילמתי: ";color:var(--muted);font-size:12px}
   .svct td.empty{grid-column:1/-1}
   .svc-btn{min-width:calc(25% - 6px);padding:8px 2px}
   .tiles{grid-template-columns:1fr 1fr}
@@ -788,7 +789,7 @@ function vDocket(id){
   <section class="dk-main">
     <div class="dk-bar"><div class="dates num">${r.start?`${fmtDate(r.start)} – ${fmtDate(r.end)} <span class="pill acc">${r.days} ימים</span>`:'<span class="muted">עוד אין תאריכים</span>'}</div><div class="small muted">מטבע הדוקט <b class="ltr">${cur}</b> · ${R?'שער קבוע לדוקט':(autoOn()?'שער יציג יומי':'שער ידני')}: <span class="num ltr">$ ${rate('USD',R)} · € ${rate('EUR',R)}</span></div></div>
     ${closed?`<div class="lockbar">${LOCKSVG.replace('14','20').replace('14','20')}<span>הדוקט נעול. אי אפשר לשנות שירותים, מחירים, נוסעים ופרטים, ואי אפשר לבטל מסמכים. עדיין אפשר לרשום תשלומים, לשלוח הודעות ולצרף קבצים.</span><button class="btn sm" data-act="toggleClose" data-id="${id}">ביטול הנעילה</button></div>`:`<div class="card" style="padding:10px"><div class="small muted" style="margin-bottom:6px">הוספת שירות:</div><div class="svc-bar">${SVC.map(([t,l,c])=>`<button class="svc-btn" data-act="svcForm" data-id="${id}" data-t="${t}">${svcIc(t,'sm')}${l}</button>`).join('')}</div></div>`}
-    <div class="tbl"><table class="svct"><thead><tr><th>#</th><th>שירות</th><th>נוסעים</th><th>תאריך התחלה</th><th>תאריך סיום</th><th>תיאור</th><th>PNR</th><th>סכום</th><th>סכום (${cur})</th><th>ספק</th><th>תשלום לספק</th></tr></thead><tbody>
+    <div class="tbl"><table class="svct"><thead><tr><th>#</th><th>שירות</th><th>נוסעים</th><th>תאריך התחלה</th><th>תאריך סיום</th><th>תיאור</th><th>PNR</th><th>סכום</th><th>סכום (${cur})</th><th>ספק</th><th>איך שילמתי</th></tr></thead><tbody>
     ${svcs.length?svcs.map((s,i)=>{const c=svcCalc(s),st=SVC_ST[s.status]||SVC_ST.ok;return `<tr class="${s.status==='cancelled'?'cancelled':''}" data-act="svcForm" data-id="${id}" data-s="${s.id}"><td class="num">${i+1}</td><td><span class="svc-type">${svcIc(s.type,'sm')}${SVC_T[s.type]}</span> <span class="pill ${st[1]}">${st[0]}</span></td><td class="num">${(s.paxIds||[]).length||s.paxCount||''}${s.perPax?' <span class="pill acc" title="מחיר לפי נוסע">₪/נוסע</span>':''}</td><td class="num">${fmtDate(s.start)}</td><td class="num">${fmtDate(s.end)}</td><td class="desc" dir="auto">${esc(s.desc||'')}${s.type==='flight'&&s.segments?.length?`<span class="sub ltr">${s.segments.map(g=>`${esc(g.from||'')}→${esc(g.to||'')} ${esc(g.flight||'')}`).join(' · ')}</span>`:''}</td><td class="ltr">${esc(s.pnr||'')}</td><td>${amt(c.sell,s.currency||cur)}</td><td>${amt(conv(c.sell,s.currency||cur,cur,R),cur)}</td><td>${esc(supName(s.supplierId))}</td><td>${supPayPill(s)}</td></tr>`}).join(''):`<tr><td colspan="11" class="empty">עוד אין שירותים. בוחרים סוג שירות למעלה, או מעלים אישור הזמנה.</td></tr>`}
     </tbody></table></div>
     <div class="grid2">
@@ -817,14 +818,15 @@ const F_SVC_A=[
   {k:'start',label:'תאריך התחלה',type:'date'},{k:'end',label:'תאריך סיום',type:'date'},
   {k:'desc',label:'תיאור (שם מלון, סוג חדר, מסלול…)',full:1},{k:'dest',label:'יעד (מדינה / עיר)'}
 ];
-const SUP_PAY_ST=[['unpaid','עוד לא שילמתי'],['paid','שילמתי הכל'],['partial','שילמתי חלק'],['direct','הלקוח שילם ישירות לספק']];
+const SUP_PAY_ST=[['unpaid','עוד לא שילמתי על המוצר'],['paid','שילמתי על המוצר במלואו'],['partial','שילמתי חלק'],['direct','הלקוח שילם ישירות (לא דרכי)']];
 const SUP_METHODS=['כרטיס אשראי של העסק','העברה בנקאית','מזומן','צ׳ק','BSP / IATA','חשבון פתוח אצל הספק','שובר / קרדיט מהספק','ביט / פייבוקס'];
-const F_SVC_PAY=[{k:'supPayStatus',label:'מצב התשלום לספק',type:'select',options:SUP_PAY_ST},{k:'supPayMethod',label:'איך שילמתי',type:'select',options:SUP_METHODS},{k:'supCard',label:'4 ספרות אחרונות של הכרטיס',ltr:1},{k:'supPaidAmount',label:'כמה שילמתי',type:'number'},{k:'supPayDate',label:'תאריך התשלום',type:'date'},{k:'supPayRef',label:'אסמכתא / מס׳ אישור',ltr:1},{k:'supDue',label:'עד מתי צריך לשלם',type:'date'}];
+const F_SVC_PAY=[{k:'supPayStatus',label:'האם שילמתי על המוצר?',type:'select',options:SUP_PAY_ST},{k:'supPayMethod',label:'במה שילמתי',type:'select',options:SUP_METHODS},{k:'supCard',label:'4 ספרות אחרונות של הכרטיס',ltr:1},{k:'supPaidAmount',label:'כמה שילמתי',type:'number'},{k:'supPayDate',label:'תאריך התשלום',type:'date'},{k:'supPayRef',label:'אסמכתא / מס׳ אישור',ltr:1},{k:'supDue',label:'עד מתי אני צריך לשלם',type:'date'}];
 function supPayPill(s){
   const st=s.supPayStatus,cu=s.currency||'';
   if(st==='paid')return `<span class="pill ok">שולם · ${esc(s.supPayMethod||'')}${s.supCard?' '+esc(s.supCard):''}</span>`;
   if(st==='partial')return `<span class="pill warn">חלקי · ${n2(s.supPaidAmount)} ${esc(cu)}</span>`;
   if(st==='direct')return '<span class="pill acc">הלקוח שילם ישירות</span>';
+  if(st==='unpaid'&&!s.supDue)return '<span class="pill">עוד לא שילמתי</span>';
   if(st==='unpaid')return `<span class="pill ${s.supDue&&s.supDue<todayISO()?'bad':''}">לא שולם${s.supDue?' · עד '+fmtDate(s.supDue):''}</span>`;
   return '<span class="pill">לא סומן</span>';
 }
@@ -848,7 +850,7 @@ function svcForm(did,sid,type,pre){
       <table class="segs"><thead><tr><th>מ-</th><th>אל</th><th>טיסה</th><th>תאריך</th><th>המראה</th><th>נחיתה</th><th></th></tr></thead><tbody id="segBody"></tbody></table></div>
     <div class="fsec"><h3>נוסעים בשירות</h3>${pax.length?`<div class="picks">${pax.map(c=>`<label><input type="checkbox" name="paxIds" value="${c.id}" ${(s.paxIds||[]).includes(c.id)?'checked':''}> ${esc(custLabel(c))}</label>`).join('')}</div>`:'<div class="muted small">אין עדיין נוסעים בדוקט. אפשר להוסיף מהדוקט.</div>'}</div>
     <div class="fsec"><h3><span>מחיר</span><label class="small" style="display:flex;gap:6px;align-items:center;font-weight:600;cursor:pointer"><input type="checkbox" id="perPax" ${s.perPax?'checked':''}> מחיר לפי נוסע (מבוגר / ילד / תינוק)</label></h3>${fieldsHTML(F_SVC_P,s,'form three')}<div id="ppBox" style="margin-top:10px"></div><div class="calc" id="calc"></div></div>
-    <div class="fsec paysec"><h3>איך שילמתי לספק</h3><p class="small muted" id="payHint" style="margin:0 0 8px"></p>${fieldsHTML(F_SVC_PAY,s,'form three')}</div>
+    <div class="fsec paysec"><h3>איך שילמתי על המוצר</h3><p class="small muted" id="payHint" style="margin:0 0 8px"></p>${fieldsHTML(F_SVC_PAY,s,'form three')}</div>
   </form>`+actionsHTML('שמירה',sid?`<button class="btn danger" id="svcDel">מחיקת השירות</button>`:''),true);
   let segs=clone(s.segments||[]);
   const drawSegs=()=>{$('#segBody').innerHTML=segs.map((g,i)=>`<tr data-i="${i}"><td data-l="מ-"><input name="from" value="${esc(g.from||'')}" dir="ltr" placeholder="TLV" style="text-transform:uppercase"></td><td data-l="אל"><input name="to" value="${esc(g.to||'')}" dir="ltr" placeholder="KRK" style="text-transform:uppercase"></td><td data-l="טיסה"><input name="flight" value="${esc(g.flight||'')}" dir="ltr" placeholder="LY5119" style="text-transform:uppercase"></td><td data-l="תאריך"><input type="date" name="date" value="${esc(g.date||'')}"></td><td data-l="המראה"><input type="time" name="dep" value="${esc(g.dep||'')}"></td><td data-l="נחיתה"><input type="time" name="arr" value="${esc(g.arr||'')}"></td><td class="segdel"><button class="btn sm danger" type="button" data-seg-del="${i}" aria-label="מחיקת קטע">×</button></td></tr>`).join('')};
@@ -870,7 +872,7 @@ function svcForm(did,sid,type,pre){
   const calc=()=>{const o=cur(),c=svcCalc(o),cu=o.currency||'';$('#calc').innerHTML=`<div><span>עלות כוללת</span><b>${amt(c.total,cu)}</b></div><div><span>עמלה</span><b>${amt(c.comm,cu)}</b></div><div><span>נטו לתשלום לספק</span><b>${amt(c.net,cu)}</b></div><div><span>מחיר מכירה</span><b>${amt(c.sell,cu)}</b></div><div class="hl"><span>רווח</span><b>${amt(c.profit,cu)}</b></div>`};
   const payVis=()=>{const st=$('#f_supPayStatus').value,m=$('#f_supPayMethod').value;if(st!=='unpaid'&&!$('#f_supPayDate').value)$('#f_supPayDate').value=todayISO();const show={supPayMethod:st==='paid'||st==='partial',supCard:(st==='paid'||st==='partial')&&/אשראי/.test(m)&&!/חשבון פתוח/.test(m),supPaidAmount:st==='partial',supPayDate:st!=='unpaid',supPayRef:st!=='unpaid',supDue:st==='unpaid'||st==='partial'};
     Object.entries(show).forEach(([k,v])=>{$('#f_'+k).closest('label').hidden=!v});
-    const o=cur(),c=svcCalc(o);$('#payHint').innerHTML=`נטו לתשלום לספק: <b class="ltr">${n2(c.net)} ${esc(o.currency||'')}</b>${st==='direct'?' · נרשם גם כתשלום של הלקוח, כך שהיתרה שלו יורדת בהתאם.':''}`};
+    const o=cur(),c=svcCalc(o);$('#payHint').innerHTML=`העלות שלי על המוצר (נטו): <b class="ltr">${n2(c.net)} ${esc(o.currency||'')}</b>${st==='direct'?' · נרשם גם כתשלום של הלקוח, כך שהיתרה שלו יורדת בהתאם.':''}`};
   $('#f_supPayStatus').addEventListener('change',payVis);$('#f_supPayMethod').addEventListener('change',payVis);
   drawPP();calc();payVis();
   $('#frm').addEventListener('input',e=>{if(F_SVC_P.some(f=>f.k===e.target.name)||e.target.closest('#ppBox'))payVis()});
@@ -883,7 +885,7 @@ function svcForm(did,sid,type,pre){
   if(sid)$('#svcDel').onclick=async()=>{if(!(await confirmBox('למחוק את השירות מהדוקט?','מחיקה')))return svcForm(did,sid);const nd=clone(S.dockets[did]);nd.services=(nd.services||[]).filter(x=>x.id!==sid);await saveRec('dockets',nd)};
   $('#frmSave').onclick=async()=>{
     const a=readFields(FA,$('#frm')),p=readFields(F_SVC_P,$('#frm')),pay=readFields(F_SVC_PAY,$('#frm'));if(!a||!p||!pay)return;
-    if(pay.supPayStatus!=='unpaid'&&!a.supplierId&&!a.newSupplier){toast('כדי לסמן תשלום לספק, צריך לבחור ספק');return}
+    if(pay.supPayStatus!=='unpaid'&&!a.supplierId&&!a.newSupplier){toast('כדי לסמן ששילמת, צריך לבחור ממי קנית את המוצר (ספק)');return}
     if(pay.supPayStatus==='partial'&&!(+pay.supPaidAmount>0)){toast('חסר: כמה שילמתי');return}
     let supplierId=a.supplierId;const ns=a.newSupplier;delete a.newSupplier;
     if(ns){const ex=vals('suppliers').find(x=>x.name.trim().toLowerCase()===ns.toLowerCase());if(ex)supplierId=ex.id;else{const rec={id:newId(),name:ns,stype:a.type==='flight'?'חברת תעופה':a.type==='hotel'?'בית מלון':'סיטונאי',createdAt:Date.now()};await saveRec('suppliers',rec);supplierId=rec.id}}
