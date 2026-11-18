@@ -102,8 +102,9 @@ function parseLines(a,b,pad){
   var sur=(parts[0]||'').replace(/</g,' ').replace(/[^A-Z ]/g,'').trim();
   var giv=(parts.slice(1).join(' ')||'').replace(/</g,' ').replace(/[^A-Z ]/g,'').replace(/\s+/g,' ').trim();
   var score=(okPn?1:0)+(okDob?1:0)+(okExp?1:0);
+  var surRaw=nameClean((a||'').replace(/^[^A-Z<]+/,'')).split('<<')[0].replace(/[^A-Z]/g,'');
   return {
-    name:(giv+' '+sur).trim(),surname:sur,given:giv,sex:sex,
+    name:(giv+' '+sur).trim(),surname:sur,given:giv,sex:sex,surRaw:surRaw,
     personal:pers.replace(/[^0-9]/g,''),
     passportNo:okPn?pnRaw.replace(/</g,''):'',
     pnPartial:pnRaw.replace(/</g,''),pnCheck:pnc,
@@ -277,8 +278,13 @@ function readViz(text,mrz){
   var U=function(l){return l.toUpperCase().replace(/[^A-Z ]/g,' ').replace(/\s+/g,' ').trim()};
   var words={};lines.forEach(function(l){if(/<</.test(l))return;U(l).split(' ').forEach(function(w){if(w.length>=2)words[w]=1})});
   /* שם משפחה: אם מה שנקרא בשורות התחתונות לא מופיע בעמוד, לוקחים את המילה מהעמוד שהיא סוף שלו (למשל BRMYKOFF ← MYKOFF) */
-  var fixName=function(n){if(!n)return n;var f=n.split(' ')[0];if(words[f])return n;for(var k=1;k<f.length-1;k++){var suf=f.slice(k);if(suf.length>=2&&words[suf])return suf+n.slice(f.length)}return n};
-  r.surname=fixName(mrz.surname);r.given=fixName(mrz.given);
+  var fixName=function(n,raw){if(!n)return n;var f=n.split(' ')[0];if(words[f])return n;for(var k=1;k<f.length-1;k++){var suf=f.slice(k);if(suf.length>=2&&words[suf])return suf+n.slice(f.length)}
+    /* ההתחלה נחתכה או נקראה לא נכון (OFF במקום MYKOFF): מחפשים בעמוד מילה שמסתיימת במה שנקרא ושיושבת בתוך מה שנקרא בשורה */
+    var cand=Object.keys(words).filter(function(w){return w.length>f.length&&w.length<=f.length+6&&w.slice(-f.length)===f&&(!raw||raw.slice(-w.length)===w||raw.indexOf(w.slice(-Math.max(3,f.length)))>=0)});
+    if(cand.length){cand.sort(function(a,b){var ra=raw&&raw.slice(-a.length)===a?0:1,rb=raw&&raw.slice(-b.length)===b?0:1;return ra-rb||b.length-a.length});return cand[0]+n.slice(f.length)}
+    if(raw){var c2=Object.keys(words).filter(function(w){return w.length>=3&&raw.slice(-w.length)===w}).sort(function(a,b){return b.length-a.length});if(c2.length)return c2[0]}
+    return n};
+  r.surname=fixName(mrz.surname,mrz.surRaw);r.given=fixName(mrz.given);
   var findLineWith=function(word){if(!word)return -1;var w=word.split(' ')[0];if(w.length<2)return -1;for(var i=0;i<lines.length;i++){if((' '+U(lines[i])+' ').indexOf(' '+w+' ')>=0&&!/<</.test(lines[i]))return i}return -1};
   var iS=findLineWith(r.surname),iG=findLineWith(r.given);
   var hebNear=function(i,labelRe,skip){

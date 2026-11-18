@@ -638,7 +638,7 @@ tbody tr{transition:background .12s}
   <p class="login-foot">הנתונים שלך שמורים בחשבון ה-Google שלך, ורק אתה רואה אותם.</p>
 </div>
 
-<script src="mrz.js?v=4"></script>
+<script src="mrz.js?v=5"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -835,7 +835,7 @@ const actionsHTML=(save,extra='')=>`<div class="actions"><button class="btn pri"
 /* ---------- customers ---------- */
 const F_CUST=[
   {k:'title',label:'תואר',type:'select',options:TITLES},{k:'lastName',label:'שם משפחה (אנגלית)',req:1,ltr:1,upper:1},{k:'firstName',label:'שם פרטי (אנגלית)',req:1,ltr:1,upper:1},
-  {k:'nameHe',label:'שם בעברית',req:1},{k:'idNum',label:'תעודת זהות',req:1,ltr:1},{k:'dob',label:'תאריך לידה',type:'date'},
+  {k:'lastNameHe',label:'שם משפחה (עברית)',req:1},{k:'firstNameHe',label:'שם פרטי (עברית)',req:1},{k:'idNum',label:'תעודת זהות',req:1,ltr:1},{k:'dob',label:'תאריך לידה',type:'date'},
   {k:'phone',label:'טלפון ראשי',type:'tel',ltr:1},{k:'email',label:'אימייל',type:'email',ltr:1},{k:'country',label:'מדינה',def:'Israel',ltr:1},
   {k:'address',label:'כתובת',full:1},{k:'source',label:'מקור (איך הגיע)'},{k:'category',label:'קטגוריה'},
   {k:'citizenship',label:'אזרחות',def:'Israeli',ltr:1},{k:'passportNo',label:'מס׳ דרכון',ltr:1},{k:'passportIssue',label:'תאריך הנפקה',type:'date'},
@@ -844,7 +844,8 @@ const F_CUST=[
 let formPhoto='';
 function customerForm(id,onSaved){
   const c=id?clone(S.customers[id]):{title:'MR'};formPhoto=c.photo||'';
-  const top=F_CUST.slice(0,12),pass=F_CUST.slice(12);
+  if(c.nameHe&&!c.firstNameHe&&!c.lastNameHe){const w=c.nameHe.trim().split(/\s+/);c.firstNameHe=w[0]||'';c.lastNameHe=w.slice(1).join(' ')}
+  const ci=F_CUST.findIndex(f=>f.k==='citizenship'),top=F_CUST.slice(0,ci),pass=F_CUST.slice(ci);
   openModal(id?'עריכת לקוח':'לקוח חדש',`<div class="scanbox"><label class="btn pri" for="ppScan"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>סריקת דרכון</label><input type="file" id="ppScan" accept="image/*" hidden><span id="scanMsg" class="small">מצלמים או בוחרים תמונה של עמוד הפרטים בדרכון, והפרטים יתמלאו לבד.</span></div><form id="frm" onsubmit="return false">${fieldsHTML(top,c,'form three')}<div class="fsec"><h3>דרכון</h3>${fieldsHTML(pass,c)}</div></form>`+actionsHTML('שמירה'),true);
   $('#f_photo').onchange=e=>{const f=e.target.files[0];if(!f)return;shrink(f,1100,.72).then(u=>{formPhoto=u;$('#photoPrev').innerHTML=`<img class="photo" src="${u}" alt="צילום דרכון">`})};
   $('#ppScan').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)scanPassport(f)};
@@ -852,7 +853,7 @@ function customerForm(id,onSaved){
     const o=readFields(F_CUST,$('#frm'));if(!o)return;
     const dup=vals('customers').find(x=>x.id!==id&&((o.idNum&&x.idNum===o.idNum)||(o.passportNo&&x.passportNo===o.passportNo)));
     if(dup&&!(await confirmBox(`כבר קיים לקוח עם אותה ת.ז. או דרכון: ${custLabel(dup)}. לשמור בכל זאת?`,'לשמור')))return customerForm(id,onSaved);
-    const rec={...c,...o,id:id||newId(),photo:formPhoto,createdAt:c.createdAt||Date.now()};
+    const rec={...c,...o,id:id||newId(),photo:formPhoto,createdAt:c.createdAt||Date.now()};rec.nameHe=[rec.firstNameHe,rec.lastNameHe].filter(Boolean).join(' ');
     closeModal();await saveRec('customers',rec);toast('הלקוח נשמר');
     if(onSaved)onSaved(rec);else openCustomer(rec.id);
   };
@@ -873,11 +874,11 @@ async function scanPassport(file){
     if(r.nationality==='ISR'){set('citizenship','Israeli');set('country','Israel')}else if(r.nationality)set('citizenship',r.nationality);
     const idv=ppId(r);if(idv)set('idNum',idv);
     set('passportIssue',r.issue);
-    if(r.nameHe&&!$('#f_nameHe').value)set('nameHe',r.nameHe);
+    if(r.surHe&&!$('#f_lastNameHe').value)set('lastNameHe',r.surHe);if(r.givHe&&!$('#f_firstNameHe').value)set('firstNameHe',r.givHe);
     if(r.sex==='M')set('title','MR');else if(r.sex==='F')set('title','MRS');
-    const miss=[!idv&&'תעודת זהות',!r.nameHe&&'שם בעברית',!r.issue&&'תאריך הנפקה'].filter(Boolean);
+    const miss=[!idv&&'תעודת זהות',!r.surHe&&'שם משפחה בעברית',!r.givHe&&'שם פרטי בעברית',!r.issue&&'תאריך הנפקה'].filter(Boolean);
     msg.textContent=(r.valid?'הפרטים נקראו ומולאו. ':'חלק מהפרטים נקראו, כדאי לבדוק אותם מול הדרכון. ')+(r.nameHe?'השם בעברית נקרא אוטומטית, כדאי לוודא את הכתיב. ':'')+(miss.length?'לא מצאתי: '+miss.join(', ')+', צריך להקליד.':'');
-    (r.nameHe?$('#f_phone'):$('#f_nameHe')).focus();
+    (!r.surHe?$('#f_lastNameHe'):!r.givHe?$('#f_firstNameHe'):$('#f_phone')).focus();
   }catch(err){msg.textContent='הסריקה נכשלה. בדוק את החיבור לאינטרנט ונסה שוב.'}
 }
 function openCustomer(id){
@@ -1386,8 +1387,8 @@ async function scanPassportsInto(did,files){
       const idn=ppId(p);
       let c=vals('customers').find(x=>x.passportNo===p.passportNo||(idn&&x.idNum===idn));
       const photo=await shrink(r.f,1100,.72).catch(()=>'');
-      if(!c){c={id:newId(),title:p.sex==='F'?'MRS':'MR',lastName:p.surname||'',firstName:p.given||'',nameHe:p.nameHe||'',idNum:idn,dob:p.dob,passportNo:p.passportNo,passportExp:p.passportExpiry,passportIssue:p.issue||'',citizenship:p.nationality==='ISR'?'Israeli':p.nationality,country:p.nationality==='ISR'?'Israel':'',photo,createdAt:Date.now()};await saveRec('customers',c);r.st='לקוח חדש: '+custLabel(c)}
-      else{await saveRec('customers',{...clone(c),passportNo:p.passportNo,passportExp:p.passportExpiry||c.passportExp,passportIssue:p.issue||c.passportIssue||'',nameHe:c.nameHe||p.nameHe||'',idNum:c.idNum||idn,photo:photo||c.photo});r.st='לקוח קיים: '+custLabel(c)+' (הדרכון עודכן)'}
+      if(!c){c={id:newId(),title:p.sex==='F'?'MRS':'MR',lastName:p.surname||'',firstName:p.given||'',nameHe:p.nameHe||'',firstNameHe:p.givHe||'',lastNameHe:p.surHe||'',idNum:idn,dob:p.dob,passportNo:p.passportNo,passportExp:p.passportExpiry,passportIssue:p.issue||'',citizenship:p.nationality==='ISR'?'Israeli':p.nationality,country:p.nationality==='ISR'?'Israel':'',photo,createdAt:Date.now()};await saveRec('customers',c);r.st='לקוח חדש: '+custLabel(c)}
+      else{await saveRec('customers',{...clone(c),passportNo:p.passportNo,passportExp:p.passportExpiry||c.passportExp,passportIssue:p.issue||c.passportIssue||'',nameHe:c.nameHe||p.nameHe||'',firstNameHe:c.firstNameHe||(!c.nameHe&&p.givHe)||'',lastNameHe:c.lastNameHe||(!c.nameHe&&p.surHe)||'',idNum:c.idNum||idn,photo:photo||c.photo});r.st='לקוח קיים: '+custLabel(c)+' (הדרכון עודכן)'}
       added.push(c.id);r.ok=1;draw();
     }catch(e){r.err=1;r.st='הסריקה נכשלה. בדוק את החיבור לאינטרנט.';draw()}
   }
@@ -1890,7 +1891,7 @@ const A={
   delPay:async d=>{const pd=S.payments[d.id]?.docketId;if(pd&&lockGuard(pd))return;if(await confirmBox('לבטל את המסמך? היתרות יחושבו מחדש.','ביטול מסמך'))removeRec('payments',d.id)},
   newLead:()=>leadForm(),editLead:d=>leadForm(d.id),
   moveLead:d=>{const l=clone(S.leads[d.id]);const i=STAGES.findIndex(s=>s[0]===(l.stage||'new'))+(+d.d);if(i<0||i>=STAGES.length)return;l.stage=STAGES[i][0];saveRec('leads',l)},
-  leadToCustomer:async d=>{const l=S.leads[d.id];await saveRec('leads',{...clone(l),stage:'won'});customerForm(null,rec=>newDocketForm(rec.id));$('#f_nameHe').value=l.name||'';$('#f_phone').value=l.phone||'';$('#f_notes').value=[l.destination,l.dates,l.notes].filter(Boolean).join(' · ')},
+  leadToCustomer:async d=>{const l=S.leads[d.id];await saveRec('leads',{...clone(l),stage:'won'});customerForm(null,rec=>newDocketForm(rec.id));{const w=(l.name||'').trim().split(/\s+/);$('#f_firstNameHe').value=w[0]||'';$('#f_lastNameHe').value=w.slice(1).join(' ')};$('#f_phone').value=l.phone||'';$('#f_notes').value=[l.destination,l.dates,l.notes].filter(Boolean).join(' · ')},
   newDebt:()=>debtForm(),editDebt:d=>debtForm(d.id),openDebt:d=>openDebt(d.id),debtPay:d=>debtPayForm(d.id),
   del:async d=>{if(await confirmBox('למחוק את הרשומה?','מחיקה'))removeRec(d.k,d.id)},
   dkFilter:d=>{ui.dkFilter=d.v;renderAll()},
