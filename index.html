@@ -638,7 +638,7 @@ tbody tr{transition:background .12s}
   <p class="login-foot">הנתונים שלך שמורים בחשבון ה-Google שלך, ורק אתה רואה אותם.</p>
 </div>
 
-<script src="mrz.js"></script>
+<script src="mrz.js?v=3"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -857,6 +857,7 @@ function customerForm(id,onSaved){
     if(onSaved)onSaved(rec);else openCustomer(rec.id);
   };
 }
+function ppId(r){if(r.nationality!=='ISR')return '';if(r.personal&&isIsraeliId(r.personal))return r.personal.padStart(9,'0');const c=(r.idCandidates||[]).find(x=>x!==r.passportNo&&isIsraeliId(x));return c?c.padStart(9,'0'):''}
 function isIsraeliId(s){s=String(s||'').padStart(9,'0');if(!/^\d{9}$/.test(s)||/^0+$/.test(s))return false;let t=0;for(let i=0;i<9;i++){let d=+s[i]*((i%2)+1);t+=d>9?d-9:d}return t%10===0}
 async function scanPassport(file){
   const msg=$('#scanMsg');if(!msg)return;
@@ -870,10 +871,13 @@ async function scanPassport(file){
     const set=(k,v)=>{const el=$('#f_'+k);if(el&&v)el.value=v};
     set('lastName',r.surname);set('firstName',r.given);set('passportNo',r.passportNo);set('dob',r.dob);set('passportExp',r.passportExpiry);
     if(r.nationality==='ISR'){set('citizenship','Israeli');set('country','Israel')}else if(r.nationality)set('citizenship',r.nationality);
-    const idOk=r.nationality==='ISR'&&r.personal&&isIsraeliId(r.personal);if(idOk)set('idNum',r.personal.padStart(9,'0'));
+    const idv=ppId(r);if(idv)set('idNum',idv);
+    set('passportIssue',r.issue);
+    if(r.nameHe&&!$('#f_nameHe').value)set('nameHe',r.nameHe);
     if(r.sex==='M')set('title','MR');else if(r.sex==='F')set('title','MRS');
-    msg.textContent=(r.valid?'הפרטים נקראו ומולאו. ':'חלק מהפרטים נקראו, כדאי לבדוק אותם מול הדרכון. ')+(idOk?'':'את תעודת הזהות לא מצאתי בדרכון, צריך להקליד. ')+'נשאר להשלים שם בעברית.';
-    $('#f_nameHe').focus();
+    const miss=[!idv&&'תעודת זהות',!r.nameHe&&'שם בעברית',!r.issue&&'תאריך הנפקה'].filter(Boolean);
+    msg.textContent=(r.valid?'הפרטים נקראו ומולאו. ':'חלק מהפרטים נקראו, כדאי לבדוק אותם מול הדרכון. ')+(r.nameHe?'השם בעברית נקרא אוטומטית, כדאי לוודא את הכתיב. ':'')+(miss.length?'לא מצאתי: '+miss.join(', ')+', צריך להקליד.':'');
+    (r.nameHe?$('#f_phone'):$('#f_nameHe')).focus();
   }catch(err){msg.textContent='הסריקה נכשלה. בדוק את החיבור לאינטרנט ונסה שוב.'}
 }
 function openCustomer(id){
@@ -1379,11 +1383,11 @@ async function scanPassportsInto(did,files){
     try{
       const p=await MRZ.scan(r.f,(pr,t)=>{r.st=(t||'קורא')+(pr?` ${Math.round(pr*100)}%`:'');draw()});
       if(!p||!p.passportNo){r.err=1;r.st='לא הצלחתי לקרוא. כדאי לצלם שוב או להוסיף ידנית.';draw();continue}
-      const idOk=p.nationality==='ISR'&&isIsraeliId(p.personal),idn=idOk?p.personal.padStart(9,'0'):'';
+      const idn=ppId(p);
       let c=vals('customers').find(x=>x.passportNo===p.passportNo||(idn&&x.idNum===idn));
       const photo=await shrink(r.f,1100,.72).catch(()=>'');
-      if(!c){c={id:newId(),title:p.sex==='F'?'MRS':'MR',lastName:p.surname||'',firstName:p.given||'',nameHe:'',idNum:idn,dob:p.dob,passportNo:p.passportNo,passportExp:p.passportExpiry,citizenship:p.nationality==='ISR'?'Israeli':p.nationality,country:p.nationality==='ISR'?'Israel':'',photo,createdAt:Date.now()};await saveRec('customers',c);r.st='לקוח חדש: '+custLabel(c)}
-      else{await saveRec('customers',{...clone(c),passportNo:p.passportNo,passportExp:p.passportExpiry||c.passportExp,photo:photo||c.photo});r.st='לקוח קיים: '+custLabel(c)+' (הדרכון עודכן)'}
+      if(!c){c={id:newId(),title:p.sex==='F'?'MRS':'MR',lastName:p.surname||'',firstName:p.given||'',nameHe:p.nameHe||'',idNum:idn,dob:p.dob,passportNo:p.passportNo,passportExp:p.passportExpiry,passportIssue:p.issue||'',citizenship:p.nationality==='ISR'?'Israeli':p.nationality,country:p.nationality==='ISR'?'Israel':'',photo,createdAt:Date.now()};await saveRec('customers',c);r.st='לקוח חדש: '+custLabel(c)}
+      else{await saveRec('customers',{...clone(c),passportNo:p.passportNo,passportExp:p.passportExpiry||c.passportExp,passportIssue:p.issue||c.passportIssue||'',nameHe:c.nameHe||p.nameHe||'',idNum:c.idNum||idn,photo:photo||c.photo});r.st='לקוח קיים: '+custLabel(c)+' (הדרכון עודכן)'}
       added.push(c.id);r.ok=1;draw();
     }catch(e){r.err=1;r.st='הסריקה נכשלה. בדוק את החיבור לאינטרנט.';draw()}
   }
