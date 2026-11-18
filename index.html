@@ -121,7 +121,7 @@ a{color:var(--accent)}
 .tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
 table{border-collapse:collapse;width:100%}
 .tbl table{min-width:720px}
-.svct{min-width:940px!important}
+.svct{min-width:1060px!important}
 .svct td{white-space:nowrap}
 .svct td.desc{white-space:normal;min-width:180px;max-width:280px}
 .scrollx{overflow-x:auto}
@@ -371,6 +371,7 @@ span.num.ltr{white-space:nowrap}
   .svct td:nth-child(8)::before{content:"סכום ";color:var(--muted);font-size:12px}
   .svct td:nth-child(9)::before{content:"בדוקט ";color:var(--muted);font-size:12px}
   .svct td:nth-child(10)::before{content:"ספק: ";color:var(--muted);font-size:12px}
+  .svct td:nth-child(11){grid-column:1/-1}
   .svct td.empty{grid-column:1/-1}
   .svc-btn{min-width:calc(25% - 6px);padding:8px 2px}
   .tiles{grid-template-columns:1fr 1fr}
@@ -787,8 +788,8 @@ function vDocket(id){
   <section class="dk-main">
     <div class="dk-bar"><div class="dates num">${r.start?`${fmtDate(r.start)} – ${fmtDate(r.end)} <span class="pill acc">${r.days} ימים</span>`:'<span class="muted">עוד אין תאריכים</span>'}</div><div class="small muted">מטבע הדוקט <b class="ltr">${cur}</b> · ${R?'שער קבוע לדוקט':(autoOn()?'שער יציג יומי':'שער ידני')}: <span class="num ltr">$ ${rate('USD',R)} · € ${rate('EUR',R)}</span></div></div>
     ${closed?`<div class="lockbar">${LOCKSVG.replace('14','20').replace('14','20')}<span>הדוקט נעול. אי אפשר לשנות שירותים, מחירים, נוסעים ופרטים, ואי אפשר לבטל מסמכים. עדיין אפשר לרשום תשלומים, לשלוח הודעות ולצרף קבצים.</span><button class="btn sm" data-act="toggleClose" data-id="${id}">ביטול הנעילה</button></div>`:`<div class="card" style="padding:10px"><div class="small muted" style="margin-bottom:6px">הוספת שירות:</div><div class="svc-bar">${SVC.map(([t,l,c])=>`<button class="svc-btn" data-act="svcForm" data-id="${id}" data-t="${t}">${svcIc(t,'sm')}${l}</button>`).join('')}</div></div>`}
-    <div class="tbl"><table class="svct"><thead><tr><th>#</th><th>שירות</th><th>נוסעים</th><th>תאריך התחלה</th><th>תאריך סיום</th><th>תיאור</th><th>PNR</th><th>סכום</th><th>סכום (${cur})</th><th>ספק</th></tr></thead><tbody>
-    ${svcs.length?svcs.map((s,i)=>{const c=svcCalc(s),st=SVC_ST[s.status]||SVC_ST.ok;return `<tr class="${s.status==='cancelled'?'cancelled':''}" data-act="svcForm" data-id="${id}" data-s="${s.id}"><td class="num">${i+1}</td><td><span class="svc-type">${svcIc(s.type,'sm')}${SVC_T[s.type]}</span> <span class="pill ${st[1]}">${st[0]}</span></td><td class="num">${(s.paxIds||[]).length||s.paxCount||''}${s.perPax?' <span class="pill acc" title="מחיר לפי נוסע">₪/נוסע</span>':''}</td><td class="num">${fmtDate(s.start)}</td><td class="num">${fmtDate(s.end)}</td><td class="desc" dir="auto">${esc(s.desc||'')}${s.type==='flight'&&s.segments?.length?`<span class="sub ltr">${s.segments.map(g=>`${esc(g.from||'')}→${esc(g.to||'')} ${esc(g.flight||'')}`).join(' · ')}</span>`:''}</td><td class="ltr">${esc(s.pnr||'')}</td><td>${amt(c.sell,s.currency||cur)}</td><td>${amt(conv(c.sell,s.currency||cur,cur,R),cur)}</td><td>${esc(supName(s.supplierId))}</td></tr>`}).join(''):`<tr><td colspan="10" class="empty">עוד אין שירותים. בוחרים סוג שירות למעלה, או מעלים אישור הזמנה.</td></tr>`}
+    <div class="tbl"><table class="svct"><thead><tr><th>#</th><th>שירות</th><th>נוסעים</th><th>תאריך התחלה</th><th>תאריך סיום</th><th>תיאור</th><th>PNR</th><th>סכום</th><th>סכום (${cur})</th><th>ספק</th><th>תשלום לספק</th></tr></thead><tbody>
+    ${svcs.length?svcs.map((s,i)=>{const c=svcCalc(s),st=SVC_ST[s.status]||SVC_ST.ok;return `<tr class="${s.status==='cancelled'?'cancelled':''}" data-act="svcForm" data-id="${id}" data-s="${s.id}"><td class="num">${i+1}</td><td><span class="svc-type">${svcIc(s.type,'sm')}${SVC_T[s.type]}</span> <span class="pill ${st[1]}">${st[0]}</span></td><td class="num">${(s.paxIds||[]).length||s.paxCount||''}${s.perPax?' <span class="pill acc" title="מחיר לפי נוסע">₪/נוסע</span>':''}</td><td class="num">${fmtDate(s.start)}</td><td class="num">${fmtDate(s.end)}</td><td class="desc" dir="auto">${esc(s.desc||'')}${s.type==='flight'&&s.segments?.length?`<span class="sub ltr">${s.segments.map(g=>`${esc(g.from||'')}→${esc(g.to||'')} ${esc(g.flight||'')}`).join(' · ')}</span>`:''}</td><td class="ltr">${esc(s.pnr||'')}</td><td>${amt(c.sell,s.currency||cur)}</td><td>${amt(conv(c.sell,s.currency||cur,cur,R),cur)}</td><td>${esc(supName(s.supplierId))}</td><td>${supPayPill(s)}</td></tr>`}).join(''):`<tr><td colspan="11" class="empty">עוד אין שירותים. בוחרים סוג שירות למעלה, או מעלים אישור הזמנה.</td></tr>`}
     </tbody></table></div>
     <div class="grid2">
       <div class="card"><div class="panel-h"><h2>נוסעים (${pax.length})</h2>${closed?'':`<span class="row"><label class="btn sm" for="dkScan">סריקת דרכונים</label><button class="btn sm" data-act="addPax" data-id="${id}">+ להוסיף</button></span>`}</div>
@@ -814,8 +815,19 @@ const F_SVC_A=[
   {k:'supplierId',label:'ספק',type:'select',options:[]},{k:'newSupplier',label:'או ספק חדש (שם)'},
   {k:'pnr',label:'PNR',ltr:1,upper:1},{k:'ref',label:'אסמכתא / מס׳ הזמנה',ltr:1},
   {k:'start',label:'תאריך התחלה',type:'date'},{k:'end',label:'תאריך סיום',type:'date'},
-  {k:'desc',label:'תיאור (שם מלון, סוג חדר, מסלול…)',full:1},{k:'dest',label:'יעד (מדינה / עיר)'},{k:'supDue',label:'מועד תשלום לספק',type:'date'}
+  {k:'desc',label:'תיאור (שם מלון, סוג חדר, מסלול…)',full:1},{k:'dest',label:'יעד (מדינה / עיר)'}
 ];
+const SUP_PAY_ST=[['unpaid','עוד לא שילמתי'],['paid','שילמתי הכל'],['partial','שילמתי חלק'],['direct','הלקוח שילם ישירות לספק']];
+const SUP_METHODS=['כרטיס אשראי של העסק','העברה בנקאית','מזומן','צ׳ק','BSP / IATA','חשבון פתוח אצל הספק','שובר / קרדיט מהספק','ביט / פייבוקס'];
+const F_SVC_PAY=[{k:'supPayStatus',label:'מצב התשלום לספק',type:'select',options:SUP_PAY_ST},{k:'supPayMethod',label:'איך שילמתי',type:'select',options:SUP_METHODS},{k:'supCard',label:'4 ספרות אחרונות של הכרטיס',ltr:1},{k:'supPaidAmount',label:'כמה שילמתי',type:'number'},{k:'supPayDate',label:'תאריך התשלום',type:'date'},{k:'supPayRef',label:'אסמכתא / מס׳ אישור',ltr:1},{k:'supDue',label:'עד מתי צריך לשלם',type:'date'}];
+function supPayPill(s){
+  const st=s.supPayStatus,cu=s.currency||'';
+  if(st==='paid')return `<span class="pill ok">שולם · ${esc(s.supPayMethod||'')}${s.supCard?' '+esc(s.supCard):''}</span>`;
+  if(st==='partial')return `<span class="pill warn">חלקי · ${n2(s.supPaidAmount)} ${esc(cu)}</span>`;
+  if(st==='direct')return '<span class="pill acc">הלקוח שילם ישירות</span>';
+  if(st==='unpaid')return `<span class="pill ${s.supDue&&s.supDue<todayISO()?'bad':''}">לא שולם${s.supDue?' · עד '+fmtDate(s.supDue):''}</span>`;
+  return '<span class="pill">לא סומן</span>';
+}
 const F_SVC_P=[
   {k:'currency',label:'מטבע',type:'select',options:CURS},{k:'base',label:'מחיר בסיס',type:'number'},{k:'tax',label:'מיסים / אחר',type:'number'},{k:'fee',label:'דמי שירות',type:'number'},
   {k:'commPct',label:'עמלת ספק %',type:'number'},{k:'sell',label:'מחיר מכירה ללקוח',type:'number'}
@@ -824,7 +836,7 @@ function paxType(c,at){const a=ageAt(c?.dob,at);if(a===''||a==null)return 'ADT';
 function svcForm(did,sid,type,pre){
   const d=S.dockets[did];if(!d)return;
   const locked=d.status==='closed';if(locked&&!sid)return lockGuard(did);
-  const s=sid?clone((d.services||[]).find(x=>x.id===sid)):{id:newId(),type:type||'flight',status:'ok',currency:d.currency||'USD',paxIds:[...(d.passengers||[])],segments:[],...(pre||{})};
+  const s=sid?clone((d.services||[]).find(x=>x.id===sid)):{id:newId(),type:type||'flight',status:'ok',currency:d.currency||'USD',paxIds:[...(d.passengers||[])],segments:[],supPayStatus:'unpaid',supPayMethod:'כרטיס אשראי של העסק',supPayDate:todayISO(),...(pre||{})};
   const note=s._note;delete s._note;
   if(s.type==='flight'&&!(s.segments||[]).length)s.segments=[{}];
   const FA=F_SVC_A.map(f=>f.k==='supplierId'?{...f,options:[['','— בחירה —'],...vals('suppliers').sort((a,b)=>a.name.localeCompare(b.name)).map(x=>[x.id,x.name])]}:f);
@@ -836,6 +848,7 @@ function svcForm(did,sid,type,pre){
       <table class="segs"><thead><tr><th>מ-</th><th>אל</th><th>טיסה</th><th>תאריך</th><th>המראה</th><th>נחיתה</th><th></th></tr></thead><tbody id="segBody"></tbody></table></div>
     <div class="fsec"><h3>נוסעים בשירות</h3>${pax.length?`<div class="picks">${pax.map(c=>`<label><input type="checkbox" name="paxIds" value="${c.id}" ${(s.paxIds||[]).includes(c.id)?'checked':''}> ${esc(custLabel(c))}</label>`).join('')}</div>`:'<div class="muted small">אין עדיין נוסעים בדוקט. אפשר להוסיף מהדוקט.</div>'}</div>
     <div class="fsec"><h3><span>מחיר</span><label class="small" style="display:flex;gap:6px;align-items:center;font-weight:600;cursor:pointer"><input type="checkbox" id="perPax" ${s.perPax?'checked':''}> מחיר לפי נוסע (מבוגר / ילד / תינוק)</label></h3>${fieldsHTML(F_SVC_P,s,'form three')}<div id="ppBox" style="margin-top:10px"></div><div class="calc" id="calc"></div></div>
+    <div class="fsec paysec"><h3>איך שילמתי לספק</h3><p class="small muted" id="payHint" style="margin:0 0 8px"></p>${fieldsHTML(F_SVC_PAY,s,'form three')}</div>
   </form>`+actionsHTML('שמירה',sid?`<button class="btn danger" id="svcDel">מחיקת השירות</button>`:''),true);
   let segs=clone(s.segments||[]);
   const drawSegs=()=>{$('#segBody').innerHTML=segs.map((g,i)=>`<tr data-i="${i}"><td data-l="מ-"><input name="from" value="${esc(g.from||'')}" dir="ltr" placeholder="TLV" style="text-transform:uppercase"></td><td data-l="אל"><input name="to" value="${esc(g.to||'')}" dir="ltr" placeholder="KRK" style="text-transform:uppercase"></td><td data-l="טיסה"><input name="flight" value="${esc(g.flight||'')}" dir="ltr" placeholder="LY5119" style="text-transform:uppercase"></td><td data-l="תאריך"><input type="date" name="date" value="${esc(g.date||'')}"></td><td data-l="המראה"><input type="time" name="dep" value="${esc(g.dep||'')}"></td><td data-l="נחיתה"><input type="time" name="arr" value="${esc(g.arr||'')}"></td><td class="segdel"><button class="btn sm danger" type="button" data-seg-del="${i}" aria-label="מחיקת קטע">×</button></td></tr>`).join('')};
@@ -855,7 +868,12 @@ function svcForm(did,sid,type,pre){
   };
   const cur=()=>{readPP();const o=readFields(F_SVC_P,$('#frm'))||{};return {...o,perPax:$('#perPax').checked,paxPrices:pp,paxIds:selPax()}};
   const calc=()=>{const o=cur(),c=svcCalc(o),cu=o.currency||'';$('#calc').innerHTML=`<div><span>עלות כוללת</span><b>${amt(c.total,cu)}</b></div><div><span>עמלה</span><b>${amt(c.comm,cu)}</b></div><div><span>נטו לתשלום לספק</span><b>${amt(c.net,cu)}</b></div><div><span>מחיר מכירה</span><b>${amt(c.sell,cu)}</b></div><div class="hl"><span>רווח</span><b>${amt(c.profit,cu)}</b></div>`};
-  drawPP();calc();
+  const payVis=()=>{const st=$('#f_supPayStatus').value,m=$('#f_supPayMethod').value;if(st!=='unpaid'&&!$('#f_supPayDate').value)$('#f_supPayDate').value=todayISO();const show={supPayMethod:st==='paid'||st==='partial',supCard:(st==='paid'||st==='partial')&&/אשראי/.test(m)&&!/חשבון פתוח/.test(m),supPaidAmount:st==='partial',supPayDate:st!=='unpaid',supPayRef:st!=='unpaid',supDue:st==='unpaid'||st==='partial'};
+    Object.entries(show).forEach(([k,v])=>{$('#f_'+k).closest('label').hidden=!v});
+    const o=cur(),c=svcCalc(o);$('#payHint').innerHTML=`נטו לתשלום לספק: <b class="ltr">${n2(c.net)} ${esc(o.currency||'')}</b>${st==='direct'?' · נרשם גם כתשלום של הלקוח, כך שהיתרה שלו יורדת בהתאם.':''}`};
+  $('#f_supPayStatus').addEventListener('change',payVis);$('#f_supPayMethod').addEventListener('change',payVis);
+  drawPP();calc();payVis();
+  $('#frm').addEventListener('input',e=>{if(F_SVC_P.some(f=>f.k===e.target.name)||e.target.closest('#ppBox'))payVis()});
   if(locked){$('#frm').querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=true);['#frmSave','#svcDel','#segAdd'].forEach(s=>{const b=$(s);if(b)b.remove()});$('#modal h2').innerHTML=LOCKSVG+' צפייה בשירות · הדוקט נעול'}
   $('#frm').addEventListener('input',e=>{if(e.target.closest('#ppBox')||F_SVC_P.some(f=>f.k===e.target.name))calc()});
   $('#frm').addEventListener('change',e=>{if(e.target.name==='paxIds'||e.target.id==='perPax'){readPP();
@@ -864,18 +882,33 @@ function svcForm(did,sid,type,pre){
     drawPP();calc()}});
   if(sid)$('#svcDel').onclick=async()=>{if(!(await confirmBox('למחוק את השירות מהדוקט?','מחיקה')))return svcForm(did,sid);const nd=clone(S.dockets[did]);nd.services=(nd.services||[]).filter(x=>x.id!==sid);await saveRec('dockets',nd)};
   $('#frmSave').onclick=async()=>{
-    const a=readFields(FA,$('#frm')),p=readFields(F_SVC_P,$('#frm'));if(!a||!p)return;
+    const a=readFields(FA,$('#frm')),p=readFields(F_SVC_P,$('#frm')),pay=readFields(F_SVC_PAY,$('#frm'));if(!a||!p||!pay)return;
+    if(pay.supPayStatus!=='unpaid'&&!a.supplierId&&!a.newSupplier){toast('כדי לסמן תשלום לספק, צריך לבחור ספק');return}
+    if(pay.supPayStatus==='partial'&&!(+pay.supPaidAmount>0)){toast('חסר: כמה שילמתי');return}
     let supplierId=a.supplierId;const ns=a.newSupplier;delete a.newSupplier;
     if(ns){const ex=vals('suppliers').find(x=>x.name.trim().toLowerCase()===ns.toLowerCase());if(ex)supplierId=ex.id;else{const rec={id:newId(),name:ns,stype:a.type==='flight'?'חברת תעופה':a.type==='hotel'?'בית מלון':'סיטונאי',createdAt:Date.now()};await saveRec('suppliers',rec);supplierId=rec.id}}
     const paxIds=selPax(),perPax=$('#perPax').checked;readPP();
-    const rec={...s,...a,...p,supplierId,paxIds,perPax};delete rec.newSupplier;
+    const rec={...s,...a,...p,...pay,supplierId,paxIds,perPax};delete rec.newSupplier;
     rec.paxPrices=perPax?Object.fromEntries(paxIds.map(id=>[id,pp[id]||{}])):{};
     rec.segments=rec.type==='flight'?readSegs().filter(g=>g.from||g.to||g.flight||g.date):[];
     if(rec.type==='flight'&&rec.segments.length){const ds=rec.segments.map(g=>g.date).filter(Boolean).sort();if(!rec.start)rec.start=ds[0]||'';if(!rec.end)rec.end=ds[ds.length-1]||rec.start;if(!rec.desc)rec.desc=rec.segments.map(g=>`${g.from}→${g.to}`).join(' · ')}
     if(!rec.start){toast('חסר: תאריך התחלה');return}
     const nd=clone(S.dockets[did]);nd.services=nd.services||[];const i=nd.services.findIndex(x=>x.id===rec.id);if(i>=0)nd.services[i]=rec;else nd.services.push(rec);
-    closeModal();await saveRec('dockets',nd);toast('השירות נשמר');
+    closeModal();await saveRec('dockets',nd);await syncSupPay(did,rec);toast('השירות נשמר');
   };
+}
+async function syncSupPay(did,s){
+  const d=S.dockets[did];if(!d)return;
+  const linked=vals('payments').filter(p=>p.svcId===s.id&&p.auto);
+  const want=s.status!=='cancelled'&&['paid','partial','direct'].includes(s.supPayStatus)&&s.supplierId;
+  const amtPaid=s.supPayStatus==='partial'?(+s.supPaidAmount||0):svcCalc(s).net;
+  const cu=s.currency||d.currency,date=s.supPayDate||todayISO();
+  const upsert=async(kind,extra)=>{const ex=linked.find(p=>p.kind===kind);const base=ex?clone(ex):{id:newId(),kind,auto:true,svcId:s.id,docketId:did,number:await nextNo(kind==='PMT'?'pmtNo':'recNo',kind==='PMT'?4016000:2011000),createdAt:Date.now()};await saveRec('payments',{...base,amount:Math.round(amtPaid*100)/100,currency:cu,date,...extra})};
+  if(want&&amtPaid>0){
+    await upsert('PMT',{supplierId:s.supplierId,method:s.supPayStatus==='direct'?'ישירות ע״י הלקוח':(s.supPayMethod||'')+(s.supCard?' '+s.supCard:''),note:s.supPayRef||''});
+    if(s.supPayStatus==='direct')await upsert('REC',{direct:true,payerId:d.customerId||(s.paxIds||[])[0]||'',method:'שולם ישירות לספק',note:supName(s.supplierId)});
+  }
+  for(const p of linked){if(!want||!(amtPaid>0)||(p.kind==='REC'&&s.supPayStatus!=='direct'))await removeRec('payments',p.id)}
 }
 function itineraryText(d){
   const k=dCalc(d);
@@ -916,6 +949,7 @@ function receiptText(p){const d=S.dockets[p.docketId]||{};return `${S.meta.bizNa
 function openPay(id){
   const p=S.payments[id];if(!p)return;const d=S.dockets[p.docketId];
   if(p.kind==='PMT'){openModal('תשלום לספק · PMT '+p.number,`<div class="kv"><div><span>ספק</span><b>${esc(supName(p.supplierId))}</b></div><div><span>סכום</span><b>${amt(p.amount,p.currency)}</b></div><div><span>תאריך</span><b>${fmtDate(p.date)}</b></div><div><span>אמצעי</span><b>${esc(p.method)}</b></div><div><span>דוקט</span><b>${d?'#'+d.number:'—'}</b></div></div>${p.note?`<p>${esc(p.note)}</p>`:''}<div class="actions">${d?`<button class="btn" data-act="goDocket" data-id="${d.id}">לדוקט</button>`:''}<button class="btn danger" data-act="delPay" data-id="${id}">ביטול התשלום</button></div>`);return}
+  if(p.direct){openModal('תשלום ישיר של הלקוח לספק',`<div class="kv"><div><span>לקוח</span><b>${esc(custName(p.payerId))}</b></div><div><span>שילם ישירות ל</span><b>${esc(p.note||'')}</b></div><div><span>סכום</span><b>${amt(p.amount,p.currency)}</b></div><div><span>תאריך</span><b>${fmtDate(p.date)}</b></div></div><p class="small muted">הרישום נוצר אוטומטית מהשירות, כדי שהיתרה של הלקוח ושל הספק יהיו נכונות. כדי לשנות, עורכים את השירות בדוקט.</p>`);return}
   const c=S.customers[p.payerId]||{};
   openModal('קבלה',`<div class="receipt">
     <div class="rh"><div><div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:.04em">${esc(S.meta.bizName||'ZVI MYKOFF')}</div><div class="small">${esc(S.meta.bizId?'עוסק מס׳ '+S.meta.bizId:'')} ${esc(S.meta.bizPhone||'')}</div></div><div style="text-align:end"><div style="font-weight:700">קבלה מס׳ <span class="num">${p.number}</span></div><div class="small">${fmtDate(p.date)}</div></div></div>
