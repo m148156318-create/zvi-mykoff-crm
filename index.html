@@ -165,7 +165,8 @@ tr.cancelled td{text-decoration:line-through;color:var(--muted)}
 .modal.wide{max-width:960px}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px}
 .x{border:0;background:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
-.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.form>*{min-width:0}
 .form.three{grid-template-columns:1fr 1fr 1fr}
 .form .full{grid-column:1/-1}
 .form label{display:flex;flex-direction:column;gap:3px;font-size:12.5px;font-weight:600;color:var(--muted)}
@@ -259,6 +260,33 @@ body{background:radial-gradient(1200px 500px at 85% -10%,color-mix(in srgb,var(-
 .hero-ill{display:block;margin:0 auto 10px}
 
 .login-card{box-shadow:var(--shadow);border-radius:20px;padding:40px 34px}
+/* service window (NasaOS style) */
+.sv-top{display:flex!important;flex-wrap:wrap;gap:10px;background:var(--accent-soft);border-radius:12px;padding:10px 12px;margin-bottom:12px;align-items:flex-end}
+.sv-top label{flex:1;min-width:130px}
+.sv-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:12px;align-items:start}
+.sv-card{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface)}
+.sv-h{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--accent);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.sv-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:14px 0 10px}
+.sv-tabs button{border:0;background:none;padding:8px 14px;font-weight:700;color:var(--muted);border-bottom:2.5px solid transparent;cursor:pointer;margin-bottom:-1px}
+.sv-tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.ptitle{font-weight:700;font-size:13px;color:var(--accent);margin:10px 0 4px}
+.form.prow{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pres{background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-family:var(--font-display);font-weight:600;font-size:14.5px;color:var(--ink);direction:ltr;text-align:right;min-height:36px}
+.pres.green{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.pres.red{color:var(--bad)}
+.segtools{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--bg);border-radius:10px 10px 0 0;padding:6px 10px;font-weight:700;font-size:13px}
+.segtools .btn{background:transparent;color:var(--bg);border-color:rgba(255,255,255,.35)}
+.segwrap{border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:6px;margin-bottom:10px;overflow-x:auto}
+.form label.chk{flex-direction:row;align-items:center;gap:8px;font-weight:600;cursor:pointer}
+.form label.chk input{width:auto}
+#typeSec .form{grid-template-columns:repeat(4,minmax(0,1fr))}
+#typeSec .form .w2{grid-column:span 2}
+@media (max-width:760px){#typeSec .form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#rowBody input,#rowBody select{min-width:74px}
+#typeSec .segs .tot{font-family:var(--font-display);font-weight:600;white-space:nowrap}
+.pp .tot{font-family:var(--font-display);font-weight:600;white-space:nowrap}
+@media (max-width:900px){.sv-cols{grid-template-columns:1fr}}
+@media (max-width:760px){.form.prow{grid-template-columns:1fr 1fr}.segtools{border-radius:10px}.segwrap{border:0;padding:6px 0}}
 /* clean sign-in page */
 .login{background:var(--bg);flex-direction:column;justify-content:center;gap:0}
 .login-box{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;max-width:320px;gap:6px;margin:auto 0 0}
@@ -835,67 +863,188 @@ const F_SVC_P=[
   {k:'commPct',label:'עמלת ספק %',type:'number'},{k:'sell',label:'מחיר מכירה ללקוח',type:'number'}
 ];
 function paxType(c,at){const a=ageAt(c?.dob,at);if(a===''||a==null)return 'ADT';return a<2?'INF':a<12?'CHD':'ADT'}
+const BOARDS=[['RO','RO · לינה בלבד'],['BB','BB · ארוחת בוקר'],['HB','HB · חצי פנסיון'],['FB','FB · פנסיון מלא'],['AI','AI · הכל כלול']];
+const ROOMS=['Single','Double','Twin','Triple','Quad','Family','Suite','Junior Suite','Studio','Apartment'];
+const TL_GEN={fields:[{k:'title',label:'כותרת',full:1},{k:'start',label:'תאריך התחלה',type:'date',w:2},{k:'end',label:'תאריך סיום',type:'date',w:2},{k:'desc',label:'פרטים',type:'textarea',full:1},{k:'dest',label:'מדינה',w:2},{k:'area',label:'אזור',w:2}]};
+const TL_TOUR=t=>({fields:[{k:'title',label:t,w:2},{k:'dest',label:'יעד',w:2},{k:'start',label:'תאריך התחלה',type:'date'},{k:'startTime',label:'שעה',type:'time'},{k:'end',label:'תאריך סיום',type:'date'},{k:'endTime',label:'שעה',type:'time'}],
+  rows:{title:'רכיבים',cols:[{k:'item',label:'שירות',w:'40%'},{k:'qty',label:'כמות',type:'number',def:1},{k:'price',label:'מחיר',type:'number'}],tot:r=>(+r.qty||0)*(+r.price||0),seed:[{item:'Land'},{item:'Flight'},{item:'Tips'},{item:'Taxes'},{item:'Insurance'}]}});
+const TL={
+  hotel:{fields:[{k:'hotelName',label:'בית מלון',full:1},{k:'start',label:'קבלה (צ׳ק-אין)',type:'date',w:2},{k:'inTime',label:'שעה',type:'time',def:'15:00'},{k:'end',label:'עזיבה (צ׳ק-אאוט)',type:'date',w:2},{k:'outTime',label:'שעה',type:'time',def:'11:00'},{k:'nights',label:'לילות',type:'number'},{k:'dest',label:'מדינה'},{k:'area',label:'אזור / עיר',w:2}],
+    rows:{title:'חדרים',cols:[{k:'qty',label:'כמות',type:'number',def:1},{k:'room',label:'סוג',opts:ROOMS,def:'Double'},{k:'board',label:'בסיס',opts:BOARDS,def:'BB'},{k:'price',label:'מחיר',type:'number'},{k:'disc',label:'הנחה',type:'number'},{k:'rdesc',label:'תיאור'}],tot:r=>(+r.qty||0)*(+r.price||0)-(+r.disc||0),seed:[{qty:1,room:'Double',board:'BB'}]}},
+  tour:TL_TOUR('כותרת הטיול'),package:TL_TOUR('שם החבילה'),daytrip:TL_TOUR('כותרת הטיול'),
+  cruise:{fields:[{k:'title',label:'אונייה / חברת שיט',w:2},{k:'cabin',label:'סוג תא',w:2},{k:'start',label:'תאריך הפלגה',type:'date'},{k:'startTime',label:'שעה',type:'time'},{k:'end',label:'תאריך חזרה',type:'date'},{k:'dest',label:'נמל יציאה / מסלול',full:1}],
+    rows:{title:'נמלים',cols:[{k:'port',label:'נמל',w:'40%'},{k:'date',label:'תאריך',type:'date'},{k:'arr',label:'הגעה',type:'time'},{k:'dep',label:'יציאה',type:'time'}]}},
+  visa:{fields:[{k:'dest',label:'שם המדינה',w:2},{k:'visaType',label:'סוג ויזה',w:2,opts:['תייר','עסקים','מעבר','סטודנט','עבודה','ESTA / ETA']},{k:'start',label:'תאריך הגשה',type:'date',w:2},{k:'end',label:'תאריך אספקה משוער',type:'date',w:2},{k:'entryType',label:'סוג כניסה',w:2,opts:['כניסה בודדת','כניסה כפולה','כניסות מרובות']},{k:'visaNo',label:'מס׳ ויזה',ltr:1,w:2},{k:'valDays',label:'תוקף · ימים',type:'number'},{k:'valWeeks',label:'שבועות',type:'number'},{k:'valMonths',label:'חודשים',type:'number'},{k:'visaExp',label:'בתוקף עד',type:'date'}]},
+  transfer:{fields:[{k:'trip',label:'סוג',w:2,opts:[['oneway','כיוון אחד'],['round','הלוך ושוב']]},{k:'vehicle',label:'רכב',w:2,opts:['','רכב פרטי','מונית','מיניבוס','ואן','אוטובוס','VIP']},
+      {k:'puAirport',label:'איסוף משדה התעופה',type:'check',grp:'פרטי איסוף'},{k:'puArea',label:'אזור / כתובת / מלון',full:1},{k:'puCountry',label:'מדינה'},{k:'start',label:'תאריך',type:'date',w:2},{k:'startTime',label:'שעה',type:'time'},
+      {k:'doAirport',label:'הורדה בשדה התעופה',type:'check',grp:'פרטי הורדה'},{k:'doArea',label:'אזור / כתובת / מלון',full:1},{k:'doCountry',label:'מדינה'},{k:'end',label:'תאריך חזרה',type:'date',only:'round',w:2},{k:'endTime',label:'שעת חזרה',type:'time',only:'round'}],
+    rows:{title:'מקטעים',cols:[{k:'from',label:'מאת',w:'28%'},{k:'to',label:'לכבוד',w:'28%'},{k:'dep',label:'יציאה',type:'datetime-local'},{k:'arr',label:'הגעה',type:'time'}]}},
+  car:{fields:[{k:'carCo',label:'חברת השכרה',w:2},{k:'carClass',label:'קבוצת רכב',w:2},{k:'puArea',label:'מקום איסוף',w:2},{k:'start',label:'תאריך איסוף',type:'date'},{k:'startTime',label:'שעה',type:'time'},{k:'doArea',label:'מקום החזרה',w:2},{k:'end',label:'תאריך החזרה',type:'date'},{k:'endTime',label:'שעה',type:'time'},{k:'dest',label:'מדינה',w:2}]},
+  insurance:{fields:[{k:'title',label:'חברת ביטוח',w:2},{k:'policy',label:'מס׳ פוליסה',ltr:1,w:2},{k:'start',label:'מתאריך',type:'date',w:2},{k:'end',label:'עד תאריך',type:'date',w:2},{k:'dest',label:'יעד',w:2},{k:'cover',label:'כיסויים (שלג, ספורט, מחלה קודמת…)',full:1}]},
+  attraction:TL_GEN,other:TL_GEN
+};
+const tlOf=t=>TL[t]||(t==='flight'?{fields:[{k:'start',label:'תאריך התחלה',type:'date',w:2},{k:'end',label:'תאריך סיום',type:'date',w:2},{k:'desc',label:'תיאור (מסלול…)',full:1},{k:'dest',label:'יעד (מדינה / עיר)',w:2}]}:TL_GEN);
+function tlFieldHTML(f,s){
+  if(f.type==='check')return `<label class="chk full"${f.grp?'':''}><input type="checkbox" name="${f.k}" ${s[f.k]?'checked':''}> ${f.label}</label>`;
+  const ff={...f};if(f.opts){ff.type='select';ff.options=f.opts}
+  let o=fieldHTML(ff,s);if(f.w)o=o.replace('<label class="','<label class="w2 ');return o.replace('<label ',`<label ${f.only?`data-only="${f.only}" `:''}`);
+}
+function tlHTML(t,s){
+  const L=tlOf(t);let h='',grp='';
+  const parts=[];let cur=[];L.fields.forEach(f=>{if(f.grp){parts.push(cur);cur=[];parts.push({g:f.grp})}cur.push(f)});parts.push(cur);
+  parts.forEach(p=>{if(p.g)h+=`<div class="ptitle">${p.g}</div>`;else if(p.length)h+=`<div class="form">${p.map(f=>tlFieldHTML(f,s)).join('')}</div>`});
+  if(L.rows){const R=L.rows;h+=`<div class="segtools" style="margin-top:10px"><span>${R.title}</span><span style="display:flex;gap:6px">${R.tot?'<button class="btn sm" id="rowCalc" type="button" title="מעביר את הסכום למחיר הבסיס של הספק">חשב ← מחיר ספק</button>':''}<button class="btn sm" id="rowAdd" type="button">+ הוספה</button></span></div><div class="segwrap"><table class="segs"><thead><tr>${R.cols.map(c=>`<th>${c.label}</th>`).join('')}${R.tot?'<th>סה״כ</th>':''}<th></th></tr></thead><tbody id="rowBody"></tbody></table></div>`}
+  return h;
+}
+function tlRowsHTML(t,rows){
+  const R=tlOf(t).rows;if(!R)return '';
+  return rows.map((r,i)=>`<tr data-i="${i}">${R.cols.map(c=>{const v=r[c.k]??c.def??'';const inp=c.opts?`<select name="${c.k}">${c.opts.map(o=>{const [a,b]=Array.isArray(o)?o:[o,o];return `<option value="${esc(a)}" ${String(v)===String(a)?'selected':''}>${esc(b)}</option>`}).join('')}</select>`:`<input name="${c.k}" type="${c.type||'text'}" ${c.type==='number'?'step="any"':''} value="${esc(v)}"${c.w?` style="min-width:120px"`:''}>`;return `<td data-l="${c.label}">${inp}</td>`}).join('')}${R.tot?`<td data-l="סה״כ" class="tot">${n2(R.tot(r))}</td>`:''}<td class="segdel"><button class="btn sm danger" type="button" data-row-del="${i}" aria-label="מחיקה">×</button></td></tr>`).join('');
+}
+function tlRead(t){
+  const L=tlOf(t),o={};
+  L.fields.forEach(f=>{const el=document.querySelector('#typeSec [name="'+f.k+'"]');if(!el)return;if(f.type==='check')o[f.k]=el.checked;else if(f.type==='number')o[f.k]=el.value===''?'':+el.value;else o[f.k]=el.value.trim()});
+  return o;
+}
+function tlReadRows(t){
+  const R=tlOf(t).rows;if(!R)return [];
+  return [...document.querySelectorAll('#rowBody tr')].map(tr=>{const r={};R.cols.forEach(c=>{const el=tr.querySelector('[name="'+c.k+'"]');r[c.k]=c.type==='number'?(el.value===''?'':+el.value):el.value.trim()});return r});
+}
+function tlDesc(t,s){
+  const rows=s.rows||[];
+  if(t==='hotel')return [s.hotelName,rows.map(r=>`${r.qty>1?r.qty+'× ':''}${r.room||''} ${r.board||''}`.trim()).filter(Boolean).join(', '),s.nights?s.nights+' לילות':''].filter(Boolean).join(' · ');
+  if(t==='visa')return ['ויזה',s.visaType,s.dest,s.entryType].filter(Boolean).join(' · ');
+  if(t==='transfer')return [s.puAirport?'שדה התעופה':s.puArea,'→',s.doAirport?'שדה התעופה':s.doArea].filter(Boolean).join(' ')+(s.trip==='round'?' (הלוך ושוב)':'')+(s.vehicle?' · '+s.vehicle:'');
+  if(t==='car')return [s.carCo,s.carClass,s.puArea].filter(Boolean).join(' · ');
+  if(t==='cruise')return [s.title,s.cabin].filter(Boolean).join(' · ');
+  if(t==='insurance')return [s.title,s.policy&&'פוליסה '+s.policy].filter(Boolean).join(' · ');
+  if(['tour','package','daytrip'].includes(t))return s.title||'';
+  return s.title||'';
+}
 function svcForm(did,sid,type,pre){
   const d=S.dockets[did];if(!d)return;
   const locked=d.status==='closed';if(locked&&!sid)return lockGuard(did);
-  const s=sid?clone((d.services||[]).find(x=>x.id===sid)):{id:newId(),type:type||'flight',status:'ok',currency:d.currency||'USD',paxIds:[...(d.passengers||[])],segments:[],supPayStatus:'unpaid',supPayMethod:'כרטיס אשראי של העסק',supPayDate:todayISO(),...(pre||{})};
+  const s=sid?clone((d.services||[]).find(x=>x.id===sid)):{id:newId(),type:type||'flight',status:'ok',currency:d.currency||'USD',paxIds:[...(d.passengers||[])],segments:[],supPayStatus:'unpaid',supPayMethod:'כרטיס אשראי של העסק',supPayDate:todayISO(),createdAt:Date.now(),...(pre||{})};
   const note=s._note;delete s._note;
   if(s.type==='flight'&&!(s.segments||[]).length)s.segments=[{}];
   const FA=F_SVC_A.map(f=>f.k==='supplierId'?{...f,options:[['','— בחירה —'],...vals('suppliers').sort((a,b)=>a.name.localeCompare(b.name)).map(x=>[x.id,x.name])]}:f);
+  const FX=[{k:'voucher',label:'מס׳ שובר',ltr:1},{k:'cancelDate',label:'תאריך ביטול',type:'date'},{k:'snotes',label:'הערות לשירות',type:'textarea',full:1}];
+  const FP2=[{k:'markupPct',label:'רווח %',type:'number'},{k:'vatPct',label:'מע״מ על הרווח',type:'select',options:[['0','ללא'],['18','18% (כלול)']]}];
+  const F={};[...FA,...FX,...F_SVC_P,...FP2,...F_SVC_PAY].forEach(f=>F[f.k]=f);
+  const fh=(k,ex)=>fieldHTML(ex?{...F[k],...ex}:F[k],s);
   const pax=(d.passengers||[]).map(p=>S.customers[p]).filter(Boolean);
+  const isFlight=s.type==='flight';
   let pp=clone(s.paxPrices||{});
-  openModal(`${sid?'עריכת':'הוספת'} שירות · דוקט #${d.number}`,`${note?`<div class="banner" style="background:var(--accent-soft);color:var(--accent)">${esc(note)}</div>`:''}<form id="frm" onsubmit="return false">
-    ${fieldsHTML(FA,s,'form three')}
-    <div class="fsec" id="segSec" ${s.type==='flight'?'':'hidden'}><h3>קטעי טיסה <button class="btn sm" id="segAdd" type="button">+ קטע</button></h3>
-      <table class="segs"><thead><tr><th>מ-</th><th>אל</th><th>טיסה</th><th>תאריך</th><th>המראה</th><th>נחיתה</th><th></th></tr></thead><tbody id="segBody"></tbody></table></div>
-    <div class="fsec"><h3>נוסעים בשירות</h3>${pax.length?`<div class="picks">${pax.map(c=>`<label><input type="checkbox" name="paxIds" value="${c.id}" ${(s.paxIds||[]).includes(c.id)?'checked':''}> ${esc(custLabel(c))}</label>`).join('')}</div>`:'<div class="muted small">אין עדיין נוסעים בדוקט. אפשר להוסיף מהדוקט.</div>'}</div>
-    <div class="fsec"><h3><span>מחיר</span><label class="small" style="display:flex;gap:6px;align-items:center;font-weight:600;cursor:pointer"><input type="checkbox" id="perPax" ${s.perPax?'checked':''}> מחיר לפי נוסע (מבוגר / ילד / תינוק)</label></h3>${fieldsHTML(F_SVC_P,s,'form three')}<div id="ppBox" style="margin-top:10px"></div><div class="calc" id="calc"></div></div>
-    <div class="fsec paysec"><h3>איך שילמתי על המוצר</h3><p class="small muted" id="payHint" style="margin:0 0 8px"></p>${fieldsHTML(F_SVC_PAY,s,'form three')}</div>
-  </form>`+actionsHTML('שמירה',sid?`<button class="btn danger" id="svcDel">מחיקת השירות</button>`:''),true);
+  openModal(`${svcIc(s.type,'sm')} ${sid?'':'הוספת '}${SVC_T[s.type]} · דוקט #${d.number}`,`${note?`<div class="banner" style="background:var(--accent-soft);color:var(--accent)">${esc(note)}</div>`:''}<form id="frm" onsubmit="return false">
+    <div class="sv-top form">${fh('type')}${fh('status')}<label>תאריך יצירה<input value="${fmtDate(new Date(s.createdAt||Date.now()).toISOString().slice(0,10))}" disabled></label>${fh('cancelDate')}</div>
+    <div class="sv-cols">
+      <section class="sv-card">
+        <h3 class="sv-h">ספק</h3>
+        <div class="form">${fh('supplierId')}${fh('newSupplier')}</div>
+        <div id="supInfo" class="small muted" style="margin:6px 0 8px"></div>
+        <div class="form">${fh('pnr')}${fh('ref')}${fh('voucher')}<label>מס׳ נוסעים<input id="paxCnt" disabled></label></div>
+        <div class="sv-tabs"><button type="button" data-tab="tPrice" class="on">תמחור</button><button type="button" data-tab="tPay">איך שילמתי</button></div>
+        <div id="tPrice">
+          <div class="ptitle">מחיר ספק</div>
+          <div class="form prow">${fh('base')}${fh('tax',{label:'אחר / מס'})}${fh('fee')}<label>עלות כוללת<div class="pres" id="c_total"></div></label></div>
+          <div class="ptitle">לקוח</div>
+          <div class="form prow">${fh('markupPct')}${fh('sell',{label:'מחיר מכירה'})}<label>רווח<div class="pres green" id="c_profit"></div></label>${fh('vatPct')}</div>
+          <div class="small muted" id="c_vat" style="margin-top:4px"></div>
+          <div class="ptitle">ספק</div>
+          <div class="form prow">${fh('commPct',{label:'עמלה %'})}<label>הפחתה (עמלה)<div class="pres" id="c_comm"></div></label><label>נטו לתשלום<div class="pres red" id="c_net"></div></label>${fh('currency')}</div>
+        </div>
+        <div id="tPay" hidden><p class="small muted" id="payHint" style="margin:0 0 8px"></p><div class="form">${F_SVC_PAY.map(f=>fh(f.k)).join('')}</div></div>
+      </section>
+      <section class="sv-card">
+        <h3 class="sv-h" id="svH">${svcIc(s.type,'xs')} ${SVC_T[s.type]}</h3>
+        <div id="segSec" ${isFlight?'':'hidden'}><div class="segtools"><span>קטעי טיסה</span><button class="btn sm" id="segAdd" type="button">+ הוספת קטע</button></div><div class="segwrap"><table class="segs"><thead><tr><th>מ-</th><th>ל-</th><th>טיסה</th><th>מחלקה</th><th>תאריך המראה</th><th>שעה</th><th>תאריך נחיתה</th><th>שעה</th><th></th></tr></thead><tbody id="segBody"></tbody></table></div></div>
+        <div id="typeSec">${tlHTML(s.type,s)}</div>
+        <div class="sv-tabs"><button type="button" data-tab="tPax" class="on">נוסעים</button><button type="button" data-tab="tNotes">הערות</button></div>
+        <div id="tPax">${pax.length?`<div class="picks">${pax.map(c=>`<label><input type="checkbox" name="paxIds" value="${c.id}" ${(s.paxIds||[]).includes(c.id)?'checked':''}> ${esc(c.title||'')} ${esc(custLabel(c))}</label>`).join('')}</div>`:'<div class="muted small">אין עדיין נוסעים בדוקט. אפשר להוסיף מהדוקט.</div>'}
+          <label class="small" style="display:flex;gap:6px;align-items:center;font-weight:600;cursor:pointer;margin:10px 0 6px"><input type="checkbox" id="perPax" ${s.perPax?'checked':''}> מחיר לפי נוסע (מבוגר / ילד / תינוק)</label><div id="ppBox"></div></div>
+        <div id="tNotes" hidden><div class="form">${fh('snotes')}</div></div>
+      </section>
+    </div>
+  </form>`+actionsHTML(sid?'עדכון':'צור',sid?`<button class="btn danger" id="svcDel">מחיקת השירות</button>`:''),true);
+  $('#modal').querySelectorAll('.sv-tabs').forEach(tb=>tb.onclick=e=>{const b=e.target.closest('[data-tab]');if(!b)return;tb.querySelectorAll('[data-tab]').forEach(x=>{x.classList.toggle('on',x===b);$('#'+x.dataset.tab).hidden=x!==b})});
   let segs=clone(s.segments||[]);
-  const drawSegs=()=>{$('#segBody').innerHTML=segs.map((g,i)=>`<tr data-i="${i}"><td data-l="מ-"><input name="from" value="${esc(g.from||'')}" dir="ltr" placeholder="TLV" style="text-transform:uppercase"></td><td data-l="אל"><input name="to" value="${esc(g.to||'')}" dir="ltr" placeholder="KRK" style="text-transform:uppercase"></td><td data-l="טיסה"><input name="flight" value="${esc(g.flight||'')}" dir="ltr" placeholder="LY5119" style="text-transform:uppercase"></td><td data-l="תאריך"><input type="date" name="date" value="${esc(g.date||'')}"></td><td data-l="המראה"><input type="time" name="dep" value="${esc(g.dep||'')}"></td><td data-l="נחיתה"><input type="time" name="arr" value="${esc(g.arr||'')}"></td><td class="segdel"><button class="btn sm danger" type="button" data-seg-del="${i}" aria-label="מחיקת קטע">×</button></td></tr>`).join('')};
-  const readSegs=()=>[...document.querySelectorAll('#segBody tr')].map(tr=>{const g={};tr.querySelectorAll('input').forEach(i=>g[i.name]=['from','to','flight'].includes(i.name)?i.value.trim().toUpperCase():i.value);return g});
+  const drawSegs=()=>{$('#segBody').innerHTML=segs.map((g,i)=>`<tr data-i="${i}"><td data-l="מ-"><input name="from" value="${esc(g.from||'')}" dir="ltr" placeholder="TLV" style="text-transform:uppercase"></td><td data-l="ל-"><input name="to" value="${esc(g.to||'')}" dir="ltr" placeholder="KRK" style="text-transform:uppercase"></td><td data-l="טיסה"><input name="flight" value="${esc(g.flight||'')}" dir="ltr" placeholder="LY5119" style="text-transform:uppercase"></td><td data-l="מחלקה"><input name="cls" value="${esc(g.cls||'')}" dir="ltr" placeholder="Y" style="text-transform:uppercase;max-width:70px"></td><td data-l="תאריך המראה"><input type="date" name="date" value="${esc(g.date||'')}"></td><td data-l="שעת המראה"><input type="time" name="dep" value="${esc(g.dep||'')}"></td><td data-l="תאריך נחיתה"><input type="date" name="arrDate" value="${esc(g.arrDate||g.date||'')}"></td><td data-l="שעת נחיתה"><input type="time" name="arr" value="${esc(g.arr||'')}"></td><td class="segdel"><button class="btn sm danger" type="button" data-seg-del="${i}" aria-label="מחיקת קטע">×</button></td></tr>`).join('')};
+  const readSegs=()=>[...document.querySelectorAll('#segBody tr')].map(tr=>{const g={};tr.querySelectorAll('input').forEach(i=>g[i.name]=['from','to','flight','cls'].includes(i.name)?i.value.trim().toUpperCase():i.value);return g});
   drawSegs();
-  $('#segAdd').onclick=()=>{segs=readSegs();const last=segs[segs.length-1]||{};segs.push({from:last.to||'',date:last.date||''});drawSegs()};
+  $('#segAdd').onclick=()=>{segs=readSegs();const last=segs[segs.length-1]||{};segs.push({from:last.to||'',date:last.arrDate||last.date||''});drawSegs()};
   $('#segBody').onclick=e=>{const b=e.target.closest('[data-seg-del]');if(b){segs=readSegs();segs.splice(+b.dataset.segDel,1);drawSegs()}};
-  $('#f_type').onchange=e=>{$('#segSec').hidden=e.target.value!=='flight';if(e.target.value==='flight'&&!readSegs().length){segs=[{}];drawSegs()}};
+  $('#segBody').addEventListener('change',e=>{if(e.target.name==='date'){const tr=e.target.closest('tr'),ad=tr.querySelector('[name=arrDate]');if(!ad.value||ad.value<e.target.value)ad.value=e.target.value}});
+  let curType=s.type,rows=clone(s.rows||[]);
+  const seedRows=t=>clone(tlOf(t).rows?.seed||[]);
+  if(!rows.length&&!sid)rows=seedRows(curType);
+  const drawRows=()=>{const b=$('#rowBody');if(b)b.innerHTML=tlRowsHTML(curType,rows)};
+  const nightsSync=src=>{if(curType!=='hotel')return;const st=$('#f_start'),en=$('#f_end'),ni=$('#f_nights');if(!st||!en||!ni)return;
+    if(src==='nights'){if(st.value&&ni.value!==''){const x=new Date(st.value+'T12:00:00');x.setDate(x.getDate()+(+ni.value||0));en.value=x.toISOString().slice(0,10)}}
+    else if(st.value&&en.value){ni.value=Math.max(0,Math.round((new Date(en.value)-new Date(st.value))/864e5))}};
+  const onlyVis=()=>{const tr=document.querySelector('#typeSec [name=trip]');document.querySelectorAll('#typeSec [data-only]').forEach(l=>l.hidden=!tr||tr.value!==l.dataset.only)};
+  const bindType=()=>{drawRows();onlyVis();nightsSync();
+    const ra=$('#rowAdd');if(ra)ra.onclick=()=>{rows=tlReadRows(curType);const last=rows[rows.length-1]||{};rows.push(curType==='transfer'?{from:last.to||'',to:last.from||''}:{});drawRows()};
+    const rc=$('#rowCalc');if(rc)rc.onclick=()=>{rows=tlReadRows(curType);const R=tlOf(curType).rows,sum=rows.reduce((a,r)=>a+R.tot(r),0);$('#f_base').value=Math.round(sum*100)/100;syncMarkup();calc();payVis();toast('הסכום הועבר למחיר הספק: '+n2(sum))};
+    const rb=$('#rowBody');if(rb){rb.onclick=e=>{const b=e.target.closest('[data-row-del]');if(b){rows=tlReadRows(curType);rows.splice(+b.dataset.rowDel,1);drawRows()}};
+      rb.oninput=()=>{const R=tlOf(curType).rows;if(!R.tot)return;rb.querySelectorAll('tr').forEach((tr,i)=>{const r=tlReadRows(curType)[i];tr.querySelector('.tot').textContent=n2(R.tot(r))})}}
+    const ts=$('#typeSec');ts.onchange=e=>{const n=e.target.name;if(n==='trip')onlyVis();if(n==='nights')nightsSync('nights');else if(n==='start'||n==='end')nightsSync()}};
+  $('#f_type').onchange=e=>{const nt=e.target.value;Object.assign(s,tlRead(curType));if(tlOf(curType).rows)s['rows_'+curType]=tlReadRows(curType);
+    curType=nt;rows=clone(s['rows_'+nt]||(nt===s.type?s.rows:null)||seedRows(nt));
+    $('#typeSec').innerHTML=tlHTML(nt,s);$('#svH').innerHTML=`${svcIc(nt,'xs')} ${SVC_T[nt]}`;bindType();
+    $('#segSec').hidden=nt!=='flight';if(nt==='flight'&&!readSegs().length){segs=[{}];drawSegs()}};
+  const supInfo=()=>{const x=S.suppliers[$('#f_supplierId').value];$('#supInfo').innerHTML=x?[x.stype,x.contact&&'איש קשר: '+esc(x.contact),x.phone&&`<span class="ltr">${esc(x.phone)}</span>`,x.email&&`<span class="ltr">${esc(x.email)}</span>`].filter(Boolean).join(' · '):''};
+  $('#f_supplierId').addEventListener('change',supInfo);supInfo();
   const selPax=()=>[...document.querySelectorAll('#frm input[name=paxIds]:checked')].map(i=>i.value);
   const readPP=()=>{document.querySelectorAll('#ppBox tr[data-c]').forEach(tr=>{const o={};tr.querySelectorAll('input').forEach(i=>o[i.name]=i.value===''?'':+i.value);pp[tr.dataset.c]=o})};
   const drawPP=()=>{
-    const on=$('#perPax').checked;['base','tax','fee','sell'].forEach(k=>{$('#f_'+k).closest('label').hidden=on});
+    const on=$('#perPax').checked;['base','tax','fee','sell','markupPct'].forEach(k=>{$('#f_'+k).closest('label').hidden=on});
+    $('#paxCnt').value=selPax().length;
     if(!on){$('#ppBox').innerHTML='';return}
     const ids=selPax(),st=$('#f_start').value||dRange(d).start;
-    $('#ppBox').innerHTML=ids.length?`<table class="segs pp"><thead><tr><th>נוסע</th><th>סוג</th><th>מחיר בסיס</th><th>מיסים</th><th>דמי שירות</th><th>מחיר מכירה</th></tr></thead><tbody>${ids.map(cid=>{const c=S.customers[cid],p=pp[cid]||{};return `<tr data-c="${cid}"><td>${esc(custLabel(c))}</td><td><span class="pill ptype">${paxType(c,st)}</span></td>${['base','tax','fee','sell'].map(k=>`<td data-l="${{base:'מחיר בסיס',tax:'מיסים',fee:'דמי שירות',sell:'מחיר מכירה'}[k]}"><input type="number" step="any" name="${k}" value="${esc(p[k]??'')}" aria-label="${k}"></td>`).join('')}</tr>`}).join('')}</tbody></table><button class="btn sm" type="button" id="ppCopy" style="margin-top:6px">העתקת השורה הראשונה מכל סוג לשאר הנוסעים מאותו סוג</button>`:'<div class="muted small">מסמנים נוסעים בשירות כדי לתמחר כל אחד.</div>';
+    $('#ppBox').innerHTML=ids.length?`<div class="scrollx"><table class="segs pp"><thead><tr><th>נוסע</th><th>גיל</th><th>מחיר בסיס</th><th>מיסוי נוסף</th><th>עמלות / דמי שירות</th><th>עלות כוללת</th><th>מחיר מכירה</th></tr></thead><tbody>${ids.map(cid=>{const c=S.customers[cid],p=pp[cid]||{};return `<tr data-c="${cid}"><td>${esc(c.title||'')} ${esc(custLabel(c))}</td><td data-l="גיל"><span class="pill ptype">${paxType(c,st)}</span> ${ageAt(c.dob,st)}</td>${['base','tax','fee'].map(k=>`<td data-l="${{base:'מחיר בסיס',tax:'מיסוי נוסף',fee:'דמי שירות'}[k]}"><input type="number" step="any" name="${k}" value="${esc(p[k]??'')}" aria-label="${k}"></td>`).join('')}<td data-l="עלות כוללת" class="tot">${n2((+p.base||0)+(+p.tax||0)+(+p.fee||0))}</td><td data-l="מחיר מכירה"><input type="number" step="any" name="sell" value="${esc(p.sell??'')}" aria-label="sell"></td></tr>`}).join('')}</tbody></table></div><button class="btn sm" type="button" id="ppCopy" style="margin-top:6px">העתקת השורה הראשונה מכל סוג לשאר הנוסעים מאותו סוג</button>`:'<div class="muted small">מסמנים נוסעים כדי לתמחר כל אחד.</div>';
     const cp=$('#ppCopy');if(cp)cp.onclick=()=>{readPP();const first={};document.querySelectorAll('#ppBox tr[data-c]').forEach(tr=>{const t=tr.querySelector('.ptype').textContent;if(!first[t])first[t]=pp[tr.dataset.c];else pp[tr.dataset.c]={...first[t]}});drawPP();calc()};
   };
-  const cur=()=>{readPP();const o=readFields(F_SVC_P,$('#frm'))||{};return {...o,perPax:$('#perPax').checked,paxPrices:pp,paxIds:selPax()}};
-  const calc=()=>{const o=cur(),c=svcCalc(o),cu=o.currency||'';$('#calc').innerHTML=`<div><span>עלות כוללת</span><b>${amt(c.total,cu)}</b></div><div><span>עמלה</span><b>${amt(c.comm,cu)}</b></div><div><span>נטו לתשלום לספק</span><b>${amt(c.net,cu)}</b></div><div><span>מחיר מכירה</span><b>${amt(c.sell,cu)}</b></div><div class="hl"><span>רווח</span><b>${amt(c.profit,cu)}</b></div>`};
-  const payVis=()=>{const st=$('#f_supPayStatus').value,m=$('#f_supPayMethod').value;if(st!=='unpaid'&&!$('#f_supPayDate').value)$('#f_supPayDate').value=todayISO();const show={supPayMethod:st==='paid'||st==='partial',supCard:(st==='paid'||st==='partial')&&/אשראי/.test(m)&&!/חשבון פתוח/.test(m),supPaidAmount:st==='partial',supPayDate:st!=='unpaid',supPayRef:st!=='unpaid',supDue:st==='unpaid'||st==='partial'};
+  const cur=()=>{readPP();const o=readFields([...F_SVC_P,...FP2],$('#frm'))||{};return {...o,perPax:$('#perPax').checked,paxPrices:pp,paxIds:selPax()}};
+  const calc=()=>{
+    const o=cur(),c=svcCalc(o),cu=o.currency||'';
+    $('#c_total').textContent=`${n2(c.total)} ${cu}`;$('#c_comm').textContent=`${n2(c.comm)} ${cu}`;$('#c_net').textContent=`${n2(c.net)} ${cu}`;$('#c_profit').textContent=`${n2(c.profit)} ${cu}`;
+    const r=+o.vatPct||0;$('#c_vat').textContent=r?`מע״מ על הרווח: ${n2(c.profit*r/(100+r))} ${cu} · רווח נקי אחרי מע״מ: ${n2(c.profit*100/(100+r))} ${cu}`:'';
+    document.querySelectorAll('#ppBox tr[data-c]').forEach(tr=>{const p=pp[tr.dataset.c]||{};tr.querySelector('.tot').textContent=n2((+p.base||0)+(+p.tax||0)+(+p.fee||0))});
+  };
+  let lastEdit=s.markupPct!==''&&s.markupPct!=null&&(s.sell===''||s.sell==null)?'pct':'sell';
+  const syncMarkup=()=>{const o=readFields(F_SVC_P,$('#frm'))||{},total=(+o.base||0)+(+o.tax||0)+(+o.fee||0);if(!(total>0))return;
+    if(lastEdit==='pct'){const pc=$('#f_markupPct').value;if(pc!=='')$('#f_sell').value=Math.round(total*(1+(+pc)/100)*100)/100}
+    else{const sv=$('#f_sell').value;$('#f_markupPct').value=sv===''?'':Math.round(((+sv)/total-1)*10000)/100}};
+  const payVis=()=>{const st=$('#f_supPayStatus').value,m=$('#f_supPayMethod').value;if(st!=='unpaid'&&!$('#f_supPayDate').value)$('#f_supPayDate').value=todayISO();
+    const show={supPayMethod:st==='paid'||st==='partial',supCard:(st==='paid'||st==='partial')&&/אשראי/.test(m)&&!/חשבון פתוח/.test(m),supPaidAmount:st==='partial',supPayDate:st!=='unpaid',supPayRef:st!=='unpaid',supDue:st==='unpaid'||st==='partial'};
     Object.entries(show).forEach(([k,v])=>{$('#f_'+k).closest('label').hidden=!v});
     const o=cur(),c=svcCalc(o);$('#payHint').innerHTML=`העלות שלי על המוצר (נטו): <b class="ltr">${n2(c.net)} ${esc(o.currency||'')}</b>${st==='direct'?' · נרשם גם כתשלום של הלקוח, כך שהיתרה שלו יורדת בהתאם.':''}`};
   $('#f_supPayStatus').addEventListener('change',payVis);$('#f_supPayMethod').addEventListener('change',payVis);
-  drawPP();calc();payVis();
-  $('#frm').addEventListener('input',e=>{if(F_SVC_P.some(f=>f.k===e.target.name)||e.target.closest('#ppBox'))payVis()});
-  if(locked){$('#frm').querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=true);['#frmSave','#svcDel','#segAdd'].forEach(s=>{const b=$(s);if(b)b.remove()});$('#modal h2').innerHTML=LOCKSVG+' צפייה בשירות · הדוקט נעול'}
-  $('#frm').addEventListener('input',e=>{if(e.target.closest('#ppBox')||F_SVC_P.some(f=>f.k===e.target.name))calc()});
+  syncMarkup();drawPP();calc();payVis();bindType();
+  $('#frm').addEventListener('input',e=>{const n=e.target.name;if(n==='markupPct')lastEdit='pct';if(n==='sell'&&!e.target.closest('#ppBox'))lastEdit='sell';if(['base','tax','fee','markupPct','sell'].includes(n)&&!e.target.closest('#ppBox'))syncMarkup();if(e.target.closest('#ppBox')||[...F_SVC_P,...FP2].some(f=>f.k===n)){calc();payVis()}});
   $('#frm').addEventListener('change',e=>{if(e.target.name==='paxIds'||e.target.id==='perPax'){readPP();
     if(e.target.id==='perPax'&&e.target.checked){const ids=selPax(),empty=ids.every(id=>!pp[id]||['base','tax','fee','sell'].every(k=>pp[id][k]===''||pp[id][k]==null));
       if(ids.length&&empty){const o=readFields(F_SVC_P,$('#frm'))||{},sp=v=>v===''||v==null?'':Math.round(+v/ids.length*100)/100;ids.forEach(id=>{pp[id]={base:sp(o.base),tax:sp(o.tax),fee:sp(o.fee),sell:sp(o.sell)}})}}
-    drawPP();calc()}});
-  if(sid)$('#svcDel').onclick=async()=>{if(!(await confirmBox('למחוק את השירות מהדוקט?','מחיקה')))return svcForm(did,sid);const nd=clone(S.dockets[did]);nd.services=(nd.services||[]).filter(x=>x.id!==sid);await saveRec('dockets',nd)};
-  $('#frmSave').onclick=async()=>{
-    const a=readFields(FA,$('#frm')),p=readFields(F_SVC_P,$('#frm')),pay=readFields(F_SVC_PAY,$('#frm'));if(!a||!p||!pay)return;
+    drawPP();calc();payVis()}});
+  if(locked){$('#frm').querySelectorAll('input,select,textarea,button:not([data-tab])').forEach(x=>x.disabled=true);['#frmSave','#svcDel','#segAdd','#rowAdd','#rowCalc'].forEach(q=>{const b=$(q);if(b)b.remove()});$('#modal h2').innerHTML=LOCKSVG+' צפייה בשירות · הדוקט נעול'}
+  if(sid&&!locked)$('#svcDel').onclick=async()=>{if(!(await confirmBox('למחוק את השירות מהדוקט?','מחיקה')))return svcForm(did,sid);const nd=clone(S.dockets[did]);nd.services=(nd.services||[]).filter(x=>x.id!==sid);await saveRec('dockets',nd)};
+  if(!locked)$('#frmSave').onclick=async()=>{
+    const a=readFields(FA,$('#frm')),p=readFields(F_SVC_P,$('#frm')),pay=readFields(F_SVC_PAY,$('#frm')),x=readFields(FX,$('#frm')),p2=readFields(FP2,$('#frm'));if(!a||!p||!pay||!x||!p2)return;
     if(pay.supPayStatus!=='unpaid'&&!a.supplierId&&!a.newSupplier){toast('כדי לסמן ששילמת, צריך לבחור ממי קנית את המוצר (ספק)');return}
     if(pay.supPayStatus==='partial'&&!(+pay.supPaidAmount>0)){toast('חסר: כמה שילמתי');return}
     let supplierId=a.supplierId;const ns=a.newSupplier;delete a.newSupplier;
-    if(ns){const ex=vals('suppliers').find(x=>x.name.trim().toLowerCase()===ns.toLowerCase());if(ex)supplierId=ex.id;else{const rec={id:newId(),name:ns,stype:a.type==='flight'?'חברת תעופה':a.type==='hotel'?'בית מלון':'סיטונאי',createdAt:Date.now()};await saveRec('suppliers',rec);supplierId=rec.id}}
+    if(ns){const ex=vals('suppliers').find(y=>y.name.trim().toLowerCase()===ns.toLowerCase());if(ex)supplierId=ex.id;else{const r={id:newId(),name:ns,stype:a.type==='flight'?'חברת תעופה':a.type==='hotel'?'בית מלון':'סיטונאי',createdAt:Date.now()};await saveRec('suppliers',r);supplierId=r.id}}
     const paxIds=selPax(),perPax=$('#perPax').checked;readPP();
-    const rec={...s,...a,...p,...pay,supplierId,paxIds,perPax};delete rec.newSupplier;
+    const tl=tlRead(a.type);
+    const rec={...s,...a,...tl,...p,...p2,...x,...pay,supplierId,paxIds,perPax};delete rec.newSupplier;
+    Object.keys(rec).filter(k=>k.startsWith('rows_')).forEach(k=>delete rec[k]);
+    rec.rows=tlReadRows(a.type).filter(r=>Object.values(r).some(v=>v!==''&&v!=null&&v!==1));
+    if(!tlOf(a.type).fields.some(f=>f.k==='desc')){const dd=tlDesc(a.type,rec);if(dd)rec.desc=dd}
+    if(a.type==='transfer')rec.dest=rec.doCountry||rec.puCountry||rec.dest||'';
     rec.paxPrices=perPax?Object.fromEntries(paxIds.map(id=>[id,pp[id]||{}])):{};
     rec.segments=rec.type==='flight'?readSegs().filter(g=>g.from||g.to||g.flight||g.date):[];
-    if(rec.type==='flight'&&rec.segments.length){const ds=rec.segments.map(g=>g.date).filter(Boolean).sort();if(!rec.start)rec.start=ds[0]||'';if(!rec.end)rec.end=ds[ds.length-1]||rec.start;if(!rec.desc)rec.desc=rec.segments.map(g=>`${g.from}→${g.to}`).join(' · ')}
+    if(rec.type==='flight'&&rec.segments.length){const ds=rec.segments.flatMap(g=>[g.date,g.arrDate]).filter(Boolean).sort();if(!rec.start)rec.start=ds[0]||'';if(!rec.end)rec.end=ds[ds.length-1]||rec.start;if(!rec.desc)rec.desc=rec.segments.map(g=>`${g.from}→${g.to}`).join(' · ')}
     if(!rec.start){toast('חסר: תאריך התחלה');return}
-    const nd=clone(S.dockets[did]);nd.services=nd.services||[];const i=nd.services.findIndex(x=>x.id===rec.id);if(i>=0)nd.services[i]=rec;else nd.services.push(rec);
+    const nd=clone(S.dockets[did]);nd.services=nd.services||[];const i=nd.services.findIndex(y=>y.id===rec.id);if(i>=0)nd.services[i]=rec;else nd.services.push(rec);
     closeModal();await saveRec('dockets',nd);await syncSupPay(did,rec);toast('השירות נשמר');
   };
 }
