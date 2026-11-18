@@ -257,7 +257,7 @@ tr.cancelled td{text-decoration:line-through;color:var(--muted)}
     <section class="wg"><h3><span class="wg-nav"><button data-act="calMove" data-d="-1" aria-label="חודש קודם">›</button></span><span id="calTitle"></span><span class="wg-nav"><button data-act="calMove" data-d="1" aria-label="חודש הבא">‹</button></span></h3><div id="wCal"></div></section>
     <section class="wg"><h3>היסטוריה של הדוקטים</h3><div id="wHist"></div></section>
     <section class="wg"><h3>המרת מטבע</h3>
-      <div class="conv"><input id="cvA" type="number" value="1" step="any" aria-label="סכום"><select id="cvF" aria-label="ממטבע"><option>USD</option><option>EUR</option><option>NIS</option></select><select id="cvT" aria-label="למטבע"><option>NIS</option><option>USD</option><option>EUR</option></select><div class="res num ltr" id="cvR"></div></div>
+      <div class="conv"><input id="cvA" type="number" value="1" step="any" aria-label="סכום"><select id="cvF" aria-label="ממטבע"><option>USD</option><option>EUR</option><option>NIS</option></select><select id="cvT" aria-label="למטבע"><option>NIS</option><option>USD</option><option>EUR</option></select><div class="res num ltr" id="cvR"></div><div class="small muted" id="cvNote" style="grid-column:1/-1"></div></div>
     </section>
   </aside>
 </div>
@@ -319,7 +319,10 @@ let backend=null, loadState='loading', unsubs=[];
 const ui={flightDate:todayISO(),calMonth:todayISO().slice(0,7),dkFilter:'open',ldType:'all'};
 
 /* ---------- money ---------- */
-const rate=c=>{if(!c||c==='NIS')return 1;const r=+((S.meta.rates||{})[c]);return r>0?r:DEF_RATES[c]||1};
+let AUTO=null;
+const autoOn=()=>S.meta.rateMode!=='manual'&&AUTO&&+AUTO.USD>0;
+const rate=c=>{if(!c||c==='NIS')return 1;if(autoOn()&&+AUTO[c]>0)return +AUTO[c];const r=+((S.meta.rates||{})[c]);return r>0?r:DEF_RATES[c]||1};
+function loadRates(){fetch('rates.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&+j.USD>0){AUTO=j;renderAll()}}).catch(()=>{})}
 const conv=(a,from,to)=>(+a||0)*rate(from)/rate(to);
 function svcCalc(s){
   const base=+s.base||0,tax=+s.tax||0,fee=+s.fee||0,total=base+tax+fee,comm=base*(+s.commPct||0)/100,net=total-comm;
@@ -357,7 +360,7 @@ const balPill=(b,cur)=>b>0.5?`<span class="pill bad">${amt(b,cur)}</span>`:'<spa
 /* ---------- storage ---------- */
 function setSaveState(t){$('#saveState').textContent=t}
 function boot(){
-  renderAll();
+  renderAll();loadRates();setInterval(loadRates,3*3600e3);
   if(!window.firebase||!FIREBASE_CONFIG.apiKey){useLocal();return}
   firebase.initializeApp(FIREBASE_CONFIG);
   const db=firebase.firestore();
@@ -552,7 +555,7 @@ function vDocket(id){
     </div>
   </aside>
   <section class="dk-main">
-    <div class="dk-bar"><div class="dates num">${r.start?`${fmtDate(r.start)} – ${fmtDate(r.end)} <span class="pill acc">${r.days} ימים</span>`:'<span class="muted">עוד אין תאריכים</span>'}</div><div class="small muted">מטבע הדוקט <b class="ltr">${cur}</b>${cur!=='NIS'?` · שער <span class="num">${rate(cur)}</span>`:''}</div></div>
+    <div class="dk-bar"><div class="dates num">${r.start?`${fmtDate(r.start)} – ${fmtDate(r.end)} <span class="pill acc">${r.days} ימים</span>`:'<span class="muted">עוד אין תאריכים</span>'}</div><div class="small muted">מטבע הדוקט <b class="ltr">${cur}</b>${cur!=='NIS'?` · ${autoOn()?'יציג':'שער'} <span class="num">${rate(cur)}</span>`:''}</div></div>
     <div class="card" style="padding:10px"><div class="small muted" style="margin-bottom:6px">הוספת שירות:</div><div class="svc-bar">${SVC.map(([t,l,c])=>`<button class="svc-btn" data-act="svcForm" data-id="${id}" data-t="${t}"><i style="background:${c}"></i>${l}</button>`).join('')}</div></div>
     <div class="tbl"><table class="svct"><thead><tr><th>#</th><th>שירות</th><th>נוסעים</th><th>תאריך התחלה</th><th>תאריך סיום</th><th>תיאור</th><th>PNR</th><th>סכום</th><th>סכום (${cur})</th><th>ספק</th></tr></thead><tbody>
     ${svcs.length?svcs.map((s,i)=>{const c=svcCalc(s),st=SVC_ST[s.status]||SVC_ST.ok;return `<tr class="${s.status==='cancelled'?'cancelled':''}" data-act="svcForm" data-id="${id}" data-s="${s.id}"><td class="num">${i+1}</td><td><span class="tdot" style="background:${SVC_C[s.type]}"></span> ${SVC_T[s.type]} <span class="pill ${st[1]}">${st[0]}</span></td><td class="num">${(s.paxIds||[]).length||s.paxCount||''}</td><td class="num">${fmtDate(s.start)}</td><td class="num">${fmtDate(s.end)}</td><td class="desc" dir="auto">${esc(s.desc||'')}${s.type==='flight'&&s.segments?.length?`<span class="sub ltr">${s.segments.map(g=>`${esc(g.from||'')}→${esc(g.to||'')} ${esc(g.flight||'')}`).join(' · ')}</span>`:''}</td><td class="ltr">${esc(s.pnr||'')}</td><td>${amt(c.sell,s.currency||cur)}</td><td>${amt(conv(c.sell,s.currency||cur,cur),cur)}</td><td>${esc(supName(s.supplierId))}</td></tr>`}).join(''):`<tr><td colspan="10" class="empty">עוד אין שירותים. בוחרים סוג שירות למעלה.</td></tr>`}
@@ -751,7 +754,7 @@ function vAccounts(){
   const sups=vals('suppliers').map(s=>({s,b:supplierBalance(s.id)})).filter(x=>x.b.bal>0.5).sort((a,b)=>b.b.bal-a.b.bal);
   return `<h1 style="margin-bottom:12px">כספים והנהלת חשבונות</h1>
   <div class="tiles"><div class="tile"><div class="k">סך מכירות (₪)</div><div class="v num">${n2(sales)}</div></div><div class="tile"><div class="k">עלות ספקים (₪)</div><div class="v num">${n2(cost)}</div></div><div class="tile"><div class="k">רווח (₪)</div><div class="v num">${n2(sales-cost)}</div></div><div class="tile"><div class="k">התקבל מלקוחות (₪)</div><div class="v num">${n2(rec)}</div></div><div class="tile"><div class="k">שולם לספקים (₪)</div><div class="v num">${n2(pmt)}</div></div></div>
-  <p class="small muted">סכומים במטבע זר מומרים לשקלים לפי השערים במסך ההגדרות.</p>
+  <p class="small muted">סכומים במטבע זר מומרים לשקלים לפי ${autoOn()?'השער היציג של בנק ישראל':'השער הידני במסך ההגדרות'}.</p>
   <div class="grid2">
     <div class="card"><h2>לקוחות עם יתרה</h2>${owe.length?`<div class="list">${owe.map(({d,k})=>`<div class="li" data-act="goDocket" data-id="${d.id}"><span><b class="num">#${d.number}</b> ${esc(d.title)}<span class="sub">תאריך תשלום ${fmtDate(d.paymentDue)}</span></span><span class="pill bad">${amt(k.bal,k.cur)}</span></div>`).join('')}</div>`:'<div class="muted small">אין יתרות פתוחות</div>'}</div>
     <div class="card"><h2>יתרות לספקים</h2>${sups.length?`<div class="list">${sups.map(({s,b})=>`<div class="li" data-act="openSupplier" data-id="${s.id}"><span>${esc(s.name)}</span><span class="pill bad num">${n2(b.bal)} ₪</span></div>`).join('')}</div>`:'<div class="muted small">הכל שולם לספקים</div>'}</div>
@@ -775,7 +778,9 @@ function vBackup(){
   <div class="card"><h2>פרטי העסק ושערים</h2><form class="form" id="bizF" onsubmit="return false">
     <label class="full" for="bizName">שם העסק<input id="bizName" value="${esc(m.bizName||'ZVI MYKOFF')}"></label>
     <label for="bizId">מספר עוסק<input id="bizId" value="${esc(m.bizId||'')}" dir="ltr"></label><label for="bizPhone">טלפון<input id="bizPhone" value="${esc(m.bizPhone||'')}" dir="ltr"></label>
-    <label for="rUSD">שער דולר (₪)<input id="rUSD" type="number" step="any" value="${esc(r.USD||DEF_RATES.USD)}"></label><label for="rEUR">שער יורו (₪)<input id="rEUR" type="number" step="any" value="${esc(r.EUR||DEF_RATES.EUR)}"></label>
+    <label class="full" for="rMode">שערי מטבע<select id="rMode"><option value="auto" ${m.rateMode!=='manual'?'selected':''}>שער יציג של בנק ישראל (מתעדכן לבד)</option><option value="manual" ${m.rateMode==='manual'?'selected':''}>שער ידני</option></select></label>
+    <div class="full small muted">${AUTO?`שער יציג אחרון: דולר <b class="num">${AUTO.USD}</b> · יורו <b class="num">${AUTO.EUR}</b> · מתאריך ${fmtDate(AUTO.date)}`:'השער היציג עוד לא נטען. עד אז משתמשים בשער הידני.'}</div>
+    <label for="rUSD">שער דולר ידני (₪)<input id="rUSD" type="number" step="any" value="${esc(r.USD||DEF_RATES.USD)}"></label><label for="rEUR">שער יורו ידני (₪)<input id="rEUR" type="number" step="any" value="${esc(r.EUR||DEF_RATES.EUR)}"></label>
   </form><div class="actions"><button class="btn pri" data-act="saveBiz">שמירה</button></div><p class="muted small">הקבלות כאן הן לתיעוד פנימי. קבלה רשמית לרשות המסים צריכה להיות מתוכנה מאושרת.</p></div>
   <div class="card"><h2>גיבוי</h2><p class="small muted">הנתונים נשמרים אוטומטית בענן של Google. אפשר גם להוריד עותק גיבוי ולשחזר ממנו.</p><div class="row"><button class="btn" data-act="exportData">הורדת גיבוי</button><label class="btn" for="imp">שחזור מקובץ גיבוי</label><input type="file" id="imp" accept=".json,.txt,application/json" hidden></div>
   <p class="small muted" style="margin-top:12px">דוקטים ${vals('dockets').length} · לקוחות ${vals('customers').length} · ספקים ${vals('suppliers').length} · מסמכים ${vals('payments').length}</p>
@@ -807,7 +812,7 @@ function renderWidgets(){
   $('#wHist').innerHTML=hist.length?`<table><thead><tr><th>דוקט</th><th>כותרת</th></tr></thead><tbody>${hist.map(d=>`<tr data-act="goDocket" data-id="${d.id}"><td class="num">${d.number}</td><td class="ltr">${esc(d.title)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">אין עדיין דוקטים</div>';
   convCalc();
 }
-function convCalc(){const a=+$('#cvA').value||0,f=$('#cvF').value,t=$('#cvT').value;$('#cvR').textContent=`${n2(conv(a,f,t))} ${t}`}
+function convCalc(){const a=+$('#cvA').value||0,f=$('#cvF').value,t=$('#cvT').value;$('#cvR').textContent=`${n2(conv(a,f,t))} ${t}`;$('#cvNote').textContent=autoOn()?`שער יציג מ-${fmtDate(AUTO.date)}`:'שער ידני'}
 ['cvA','cvF','cvT'].forEach(i=>document.getElementById(i).addEventListener('input',convCalc));
 $('#flDate').addEventListener('change',e=>{if(e.target.value){ui.flightDate=e.target.value;ui.calMonth=e.target.value.slice(0,7);renderWidgets()}});
 
@@ -850,7 +855,7 @@ const A={
   calMove:d=>{ui.calMonth=addMonths(ui.calMonth+'-01',+d.d).slice(0,7);renderWidgets()},
   calPick:d=>{ui.flightDate=d.d;renderWidgets()},
   copy:async d=>{const el=$('#'+d.src);try{await navigator.clipboard.writeText(el.value);toast('הועתק')}catch(e){el.hidden=false;el.select();toast('סמן והעתק ידנית')}},
-  saveBiz:()=>{saveMeta({...S.meta,bizName:$('#bizName').value.trim(),bizId:$('#bizId').value.trim(),bizPhone:$('#bizPhone').value.trim(),rates:{USD:+$('#rUSD').value||DEF_RATES.USD,EUR:+$('#rEUR').value||DEF_RATES.EUR}});toast('נשמר');renderAll()},
+  saveBiz:()=>{saveMeta({...S.meta,bizName:$('#bizName').value.trim(),bizId:$('#bizId').value.trim(),bizPhone:$('#bizPhone').value.trim(),rateMode:$('#rMode').value,rates:{USD:+$('#rUSD').value||DEF_RATES.USD,EUR:+$('#rEUR').value||DEF_RATES.EUR}});toast('נשמר');renderAll()},
   exportData:()=>{const data=JSON.stringify({app:'zm-crm',v:2,at:new Date().toISOString(),meta:S.meta,...Object.fromEntries(KINDS.map(k=>[k,vals(k)]))});const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='zvi-mykoff-backup-'+todayISO()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)},
   loadDemo:async()=>{if(!(await confirmBox('להוסיף נתוני דוגמה? אפשר למחוק אותם אחר כך.','הוספה')))return;await loadDemo();toast('נתוני הדוגמה נוספו')}
 };
