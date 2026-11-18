@@ -250,6 +250,21 @@ body{background:radial-gradient(1200px 500px at 85% -10%,color-mix(in srgb,var(-
 .hero-ill{display:block;margin:0 auto 10px}
 .login{background:radial-gradient(900px 500px at 50% -10%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%),linear-gradient(160deg,var(--bg),var(--surface-2))}
 .login-card{box-shadow:var(--shadow);border-radius:20px;padding:40px 34px}
+.badge{margin-inline-start:auto;background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:0 7px;font-weight:700;line-height:18px}
+.dk-acts label{color:#fff;text-align:start;padding:6px 8px;border-radius:6px;cursor:pointer;font-weight:600}
+.dk-acts label:hover{background:var(--panel-2)}
+.al-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-inline-end:8px;background:var(--accent);flex:none}
+.al-dot.bad{background:var(--bad)}.al-dot.warn{background:var(--gold)}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-size:11px;fill:var(--muted);font-family:var(--font-body)}
+.chart .lbl{fill:var(--ink);font-weight:700;font-size:10.5px}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:5px;vertical-align:middle}
+.tpl textarea{width:100%;min-height:110px}
+.pp td input{width:100%;min-width:70px}
+.form label[hidden]{display:none}
+.dk-main .grid2{grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
+.fileic{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;background:var(--accent-soft);color:var(--accent);font-size:9px;font-weight:700;margin-inline-end:8px;flex:none}
 .scanbox{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 14px;margin-bottom:14px;border-radius:12px;border:1.5px dashed color-mix(in srgb,var(--accent) 45%,transparent);background:var(--accent-soft)}
 .scanbox .btn svg{fill:currentColor}
 .scanbox #scanMsg{flex:1;min-width:200px}
@@ -383,40 +398,45 @@ const TITLES=['MR','MRS','MS','MSTR','MISS','CHD','INF'];
 const SUP_TYPES=['חברת תעופה','סיטונאי','בית מלון','ביטוח','השכרת רכב','אחר'];
 const DTYPES=['רגיל','קבוצה','חבילה','עסקי'];
 const STAGES=[['new','ליד חדש'],['contact','בטיפול'],['offer','הצעה נשלחה'],['won','נסגר'],['lost','לא רלוונטי']];
-const NAV=[['home','ראשי','M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z'],['dockets','חיפוש דוקטים','M10.5 4a6.5 6.5 0 1 0 4 11.6l4.5 4.5 1.4-1.4-4.5-4.5A6.5 6.5 0 0 0 10.5 4z'],['customers','לקוחות','M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 8c0-3.3 3.6-6 8-6s8 2.7 8 6'],['suppliers','ספקים','M3 7h18v13H3zM8 7V4h8v3'],['accounts','כספים והנהלת חשבונות','M4 20V10m6 10V4m6 16v-7m4 7H2'],['leads','לידים','M4 5h16l-6 8v6l-4-2v-4z'],['debts','חייבים לי','M12 3v18M7 7h7a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h8'],['backup','גיבוי והגדרות','M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8 4-2-1 .5-2.3-2.2-1L15 5.5 12.6 6 12 3.6l-1 2.4L8.7 5.5 7.6 7.7 5.4 8.7 6 11l-2 1 2 1-.5 2.3 2.2 1 1.1 2.2 2.3-.5L12 20.4l1-2.4 2.3.5 1.1-2.2 2.2-1L18 13z']];
+const NAV=[['home','ראשי','M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z'],['dockets','חיפוש דוקטים','M10.5 4a6.5 6.5 0 1 0 4 11.6l4.5 4.5 1.4-1.4-4.5-4.5A6.5 6.5 0 0 0 10.5 4z'],['customers','לקוחות','M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 8c0-3.3 3.6-6 8-6s8 2.7 8 6'],['suppliers','ספקים','M3 7h18v13H3zM8 7V4h8v3'],['accounts','כספים והנהלת חשבונות','M4 20V10m6 10V4m6 16v-7m4 7H2'],['reports','דוחות','M12 3v9h9A9 9 0 1 1 12 3zm3-1a7 7 0 0 1 7 7h-7z'],['leads','לידים','M4 5h16l-6 8v6l-4-2v-4z'],['debts','חייבים לי','M12 3v18M7 7h7a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h8'],['backup','גיבוי והגדרות','M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8 4-2-1 .5-2.3-2.2-1L15 5.5 12.6 6 12 3.6l-1 2.4L8.7 5.5 7.6 7.7 5.4 8.7 6 11l-2 1 2 1-.5 2.3 2.2 1 1.1 2.2 2.3-.5L12 20.4l1-2.4 2.3.5 1.1-2.2 2.2-1L18 13z']];
 
 /* ---------- state ---------- */
-const KINDS=['customers','suppliers','dockets','payments','leads','debts'];
-const S={customers:{},suppliers:{},dockets:{},payments:{},leads:{},debts:{},meta:{}};
+const KINDS=['customers','suppliers','dockets','payments','leads','debts','files'];
+const S={customers:{},suppliers:{},dockets:{},payments:{},leads:{},debts:{},files:{},meta:{}};
 let backend=null, loadState='loading', unsubs=[];
 const ui={flightDate:todayISO(),calMonth:todayISO().slice(0,7),dkFilter:'open',ldType:'all'};
 
 /* ---------- money ---------- */
 let AUTO=null;
 const autoOn=()=>S.meta.rateMode!=='manual'&&AUTO&&+AUTO.USD>0;
-const rate=c=>{if(!c||c==='NIS')return 1;if(autoOn()&&+AUTO[c]>0)return +AUTO[c];const r=+((S.meta.rates||{})[c]);return r>0?r:DEF_RATES[c]||1};
+const rate=(c,R)=>{if(!c||c==='NIS')return 1;if(R&&+R[c]>0)return +R[c];if(autoOn()&&+AUTO[c]>0)return +AUTO[c];const r=+((S.meta.rates||{})[c]);return r>0?r:DEF_RATES[c]||1};
 function loadRates(){fetch('rates.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&+j.USD>0){AUTO=j;renderAll()}}).catch(()=>{})}
-const conv=(a,from,to)=>(+a||0)*rate(from)/rate(to);
+const conv=(a,from,to,R)=>(+a||0)*rate(from,R)/rate(to,R);
+const todayRates=()=>({USD:rate('USD'),EUR:rate('EUR')});
 function svcCalc(s){
-  const base=+s.base||0,tax=+s.tax||0,fee=+s.fee||0,total=base+tax+fee,comm=base*(+s.commPct||0)/100,net=total-comm;
-  const sell=(s.sell===''||s.sell==null)?total:+s.sell;
-  return {total,comm,net,sell,profit:sell-net};
+  let base,tax,fee,sell=null;
+  if(s.perPax&&s.paxPrices){base=tax=fee=0;sell=0;(s.paxIds||Object.keys(s.paxPrices)).forEach(id=>{const p=s.paxPrices[id]||{},b=+p.base||0,t=+p.tax||0,f=+p.fee||0;base+=b;tax+=t;fee+=f;sell+=(p.sell===''||p.sell==null)?b+t+f:+p.sell})}
+  else{base=+s.base||0;tax=+s.tax||0;fee=+s.fee||0}
+  const total=base+tax+fee,comm=base*(+s.commPct||0)/100,net=total-comm;
+  if(sell==null)sell=(s.sell===''||s.sell==null)?total:+s.sell;
+  return {total,comm,net,sell,profit:sell-net,base,tax,fee};
 }
 function dCalc(d){
-  const cur=d.currency||'USD';let sales=0,cost=0;
-  (d.services||[]).forEach(s=>{if(s.status==='cancelled')return;const c=svcCalc(s);sales+=conv(c.sell,s.currency||cur,cur);cost+=conv(c.net,s.currency||cur,cur)});
+  const cur=d.currency||'USD',R=d.rates;let sales=0,cost=0;
+  (d.services||[]).forEach(s=>{if(s.status==='cancelled')return;const c=svcCalc(s);sales+=conv(c.sell,s.currency||cur,cur,R);cost+=conv(c.net,s.currency||cur,cur,R)});
   const pays=vals('payments').filter(p=>p.docketId===d.id);
-  const rec=pays.filter(p=>p.kind==='REC').reduce((a,p)=>a+conv(p.amount,p.currency,cur),0);
-  const pmt=pays.filter(p=>p.kind==='PMT').reduce((a,p)=>a+conv(p.amount,p.currency,cur),0);
+  const rec=pays.filter(p=>p.kind==='REC').reduce((a,p)=>a+conv(p.amount,p.currency,cur,R),0);
+  const pmt=pays.filter(p=>p.kind==='PMT').reduce((a,p)=>a+conv(p.amount,p.currency,cur,R),0);
   return {cur,sales,cost,profit:sales-cost,rec,pmt,bal:sales-rec,supBal:cost-pmt};
 }
+function supOwedInDocket(d,sid){let n=0;(d.services||[]).forEach(s=>{if(s.supplierId===sid&&s.status!=='cancelled')n+=conv(svcCalc(s).net,s.currency||d.currency,d.currency,d.rates)});const paid=vals('payments').filter(p=>p.kind==='PMT'&&p.docketId===d.id&&p.supplierId===sid).reduce((a,p)=>a+conv(p.amount,p.currency,d.currency,d.rates),0);return Math.max(0,n-paid)}
 function dRange(d){
   const ds=[];(d.services||[]).forEach(s=>{if(s.status==='cancelled')return;if(s.start)ds.push(s.start);if(s.end)ds.push(s.end);(s.segments||[]).forEach(g=>g.date&&ds.push(g.date))});
   ds.sort();const start=ds[0]||'',end=ds[ds.length-1]||'';return {start,end,days:start?daysBetween(start,end)+1:0};
 }
 function supplierBalance(sid){
-  let owed=0;vals('dockets').forEach(d=>(d.services||[]).forEach(s=>{if(s.supplierId===sid&&s.status!=='cancelled')owed+=conv(svcCalc(s).net,s.currency||d.currency,'NIS')}));
-  const paid=vals('payments').filter(p=>p.kind==='PMT'&&p.supplierId===sid).reduce((a,p)=>a+conv(p.amount,p.currency,'NIS'),0);
+  let owed=0;vals('dockets').forEach(d=>(d.services||[]).forEach(s=>{if(s.supplierId===sid&&s.status!=='cancelled')owed+=conv(svcCalc(s).net,s.currency||d.currency,'NIS',d.rates)}));
+  const paid=vals('payments').filter(p=>p.kind==='PMT'&&p.supplierId===sid).reduce((a,p)=>a+conv(p.amount,p.currency,'NIS',S.dockets[p.docketId]?.rates),0);
   return {owed,paid,bal:owed-paid};
 }
 const custLabel=c=>c?(c.lastName||c.firstName?`${(c.lastName||'').toUpperCase()}/${(c.firstName||'').toUpperCase()}`:(c.nameHe||'')):'';
@@ -470,12 +490,15 @@ function useDb(db,uid){
   },onErr)));
   unsubs.push(root.onSnapshot({includeMetadataChanges:true},s=>{S.meta=s.exists?s.data():{};if(!s.metadata.fromCache){fresh.add('meta');if(fresh.size>KINDS.length)done()}schedule()},onErr));
   unsubs.push(()=>clearTimeout(timer));
-  backend={save:(k,o)=>root.collection(k).doc(o.id).set(o),remove:(k,id)=>root.collection(k).doc(id).delete(),saveMeta:m=>root.set(m)};
+  backend={save:(k,o)=>root.collection(k).doc(o.id).set(o),remove:(k,id)=>root.collection(k).doc(id).delete(),saveMeta:m=>root.set(m),
+    saveChunk:o=>root.collection('fileChunks').doc(o.id).set(o),getChunks:id=>root.collection('fileChunks').where('fileId','==',id).get().then(s=>s.docs.map(x=>x.data())),delChunks:(id,n)=>Promise.all([...Array(n)].map((_,i)=>root.collection('fileChunks').doc(id+'_'+i).delete()))};
 }
 function useLocal(){
   try{const raw=localStorage.getItem('zm-crm2');if(raw)Object.assign(S,JSON.parse(raw))}catch(e){}
+  let CH={};try{CH=JSON.parse(localStorage.getItem('zm-chunks')||'{}')}catch(e){}
   const persist=()=>{try{localStorage.setItem('zm-crm2',JSON.stringify(S))}catch(e){}};
-  backend={save:async()=>persist(),remove:async()=>persist(),saveMeta:async()=>persist()};
+  const pch=()=>{try{localStorage.setItem('zm-chunks',JSON.stringify(CH))}catch(e){toast('אין מקום לקבצים בדפדפן הזה')}};
+  backend={save:async()=>persist(),remove:async()=>persist(),saveMeta:async()=>persist(),saveChunk:async o=>{CH[o.id]=o;pch()},getChunks:async id=>Object.values(CH).filter(c=>c.fileId===id),delChunks:async(id,n)=>{for(let i=0;i<n;i++)delete CH[id+'_'+i];pch()}};
   loadState='local';setSaveState('שמירה מקומית בדפדפן הזה בלבד');renderAll();
 }
 function handleErr(e){
@@ -596,7 +619,8 @@ function openSupplier(id){
   ${s.notes?`<p>${esc(s.notes)}</p>`:''}
   <div class="actions"><button class="btn pri" data-act="pmtForm" data-sup="${id}">+ תשלום לספק</button><button class="btn" data-act="editSupplier" data-id="${id}">עריכה</button></div>
   <div class="fsec"><h3>שירותים (${rows.length})</h3>${rows.length?`<div class="list">${rows.map(({d,v})=>`<div class="li" data-act="goDocket" data-id="${d.id}"><span class="svc-type">${svcIc(v.type,'xs')}<span>${SVC_T[v.type]} · #${d.number} ${esc(d.title)}<span class="sub">${fmtDate(v.start)} · ${esc(v.pnr||'')}</span></span></span>${amt(svcCalc(v).net,v.currency)}</div>`).join('')}</div>`:'<div class="muted small">אין שירותים</div>'}</div>
-  <div class="fsec"><h3>תשלומים (${pays.length})</h3>${pays.length?`<div class="list">${pays.map(p=>`<div class="li" data-act="openPay" data-id="${p.id}"><span>${fmtDate(p.date)} · ${esc(p.method)} <span class="sub">PMT ${p.number}${p.docketId&&S.dockets[p.docketId]?' · דוקט #'+S.dockets[p.docketId].number:''}</span></span>${amt(p.amount,p.currency)}</div>`).join('')}</div>`:'<div class="muted small">אין תשלומים</div>'}</div>`,true);
+  <div class="fsec"><h3>תשלומים (${pays.length})</h3>${pays.length?`<div class="list">${pays.map(p=>`<div class="li" data-act="openPay" data-id="${p.id}"><span>${fmtDate(p.date)} · ${esc(p.method)} <span class="sub">PMT ${p.number}${p.docketId&&S.dockets[p.docketId]?' · דוקט #'+S.dockets[p.docketId].number:''}</span></span>${amt(p.amount,p.currency)}</div>`).join('')}</div>`:'<div class="muted small">אין תשלומים</div>'}</div>
+  <div class="fsec"><h3>מחירונים וקבצים <label class="btn sm" for="supFile">+ העלאת קובץ</label><input type="file" id="supFile" data-id="${id}" multiple hidden></h3>${filesHTML(vals('files').filter(f=>f.supplierId===id))}</div>`,true);
 }
 
 /* ---------- dockets ---------- */
@@ -604,28 +628,35 @@ function newDocketForm(custId){
   const F=[{k:'dtype',label:'סוג דוקט',type:'select',options:DTYPES},{k:'currency',label:'מטבע',type:'select',options:CURS},{k:'title',label:'כותרת הדוקט (ריק = שם הלקוח)',full:1,upper:1,ltr:1},{k:'paymentDue',label:'תאריך תשלום',type:'date'},{k:'notes',label:'הערות',type:'textarea',full:1}];
   let cust=custId||'';
   const draw=()=>{
-    openModal('צור דוקט חדש',`<form id="frm" onsubmit="return false"><div class="fsec" style="margin-top:0;border:0;padding-top:0"><h3>לקוח עסקי</h3><div class="row"><b id="custL">${cust?esc(custLabel(S.customers[cust])):'<span class="muted">לא נבחר לקוח</span>'}</b><button class="btn sm" id="custPick">לקוח קיים</button><button class="btn sm" id="custNew">+ לקוח חדש</button></div></div><div class="fsec">${fieldsHTML(F,{currency:'USD',dtype:'רגיל'})}</div></form>`+actionsHTML('צור דוקט'));
+    openModal('צור דוקט חדש',`<div class="scanbox"><label class="btn pri" for="ndScan">פתיחה מצילומי דרכונים</label><input type="file" id="ndScan" accept="image/*" multiple hidden><span class="small">בוחרים את צילומי הדרכונים של כל הנוסעים, והדוקט נפתח עם כולם.</span></div><form id="frm" onsubmit="return false"><div class="fsec" style="margin-top:0;border:0;padding-top:0"><h3>לקוח עסקי</h3><div class="row"><b id="custL">${cust?esc(custLabel(S.customers[cust])):'<span class="muted">לא נבחר לקוח</span>'}</b><button class="btn sm" id="custPick">לקוח קיים</button><button class="btn sm" id="custNew">+ לקוח חדש</button></div></div><div class="fsec">${fieldsHTML(F,{currency:'USD',dtype:'רגיל'})}</div></form>`+actionsHTML('צור דוקט'));
     $('#custPick').onclick=()=>pickCustomer('בחירת לקוח',id=>{cust=id;draw()});
     $('#custNew').onclick=()=>customerForm(null,rec=>{cust=rec.id;draw()});
     $('#frmSave').onclick=async()=>{
       const o=readFields(F,$('#frm'));if(!o)return;
       const number=await nextNo('docketNo',1006000);
-      const d={id:newId(),number,...o,title:o.title||custLabel(S.customers[cust])||'דוקט '+number,customerId:cust,passengers:cust?[cust]:[],services:[],status:'open',openDate:todayISO(),createdAt:Date.now()};
+      const d={id:newId(),number,...o,title:o.title||custLabel(S.customers[cust])||'דוקט '+number,customerId:cust,passengers:cust?[cust]:[],services:[],status:'open',openDate:todayISO(),rates:todayRates(),createdAt:Date.now()};
       closeModal();await saveRec('dockets',d);location.hash='d-'+d.id;
     };
   };draw();
 }
+async function createDocketFromPassports(files){
+  const number=await nextNo('docketNo',1006000);
+  const d={id:newId(),number,dtype:files.length>1?'קבוצה':'רגיל',currency:'USD',title:'דוקט '+number,customerId:'',passengers:[],services:[],status:'open',openDate:todayISO(),rates:todayRates(),createdAt:Date.now()};
+  await saveRec('dockets',d);location.hash='d-'+d.id;setTimeout(()=>scanPassportsInto(d.id,files),300);
+}
 function editDocketForm(id){
-  const d=clone(S.dockets[id]);
-  const F=[{k:'title',label:'כותרת',req:1,full:1,upper:1,ltr:1},{k:'dtype',label:'סוג דוקט',type:'select',options:DTYPES},{k:'currency',label:'מטבע הדוקט',type:'select',options:CURS},{k:'paymentDue',label:'תאריך תשלום',type:'date'},{k:'customerId',label:'לקוח עסקי',type:'select',options:[['','—'],...vals('customers').map(c=>[c.id,custLabel(c)])]},{k:'notes',label:'הערות',type:'textarea',full:1}];
-  openModal('פרטי דוקט #'+d.number,`<form id="frm" onsubmit="return false">${fieldsHTML(F,d)}</form>`+actionsHTML('שמירה'));
-  $('#frmSave').onclick=async()=>{const o=readFields(F,$('#frm'));if(!o)return;closeModal();await saveRec('dockets',{...d,...o})};
+  const d=clone(S.dockets[id]);const R=d.rates||{};
+  const F=[{k:'title',label:'כותרת',req:1,full:1,upper:1,ltr:1},{k:'dtype',label:'סוג דוקט',type:'select',options:DTYPES},{k:'currency',label:'מטבע הדוקט',type:'select',options:CURS},{k:'paymentDue',label:'תאריך תשלום',type:'date'},{k:'customerId',label:'לקוח עסקי',type:'select',options:[['','—'],...vals('customers').map(c=>[c.id,custLabel(c)])]},{k:'rUSD',label:'שער דולר לדוקט',type:'number'},{k:'rEUR',label:'שער יורו לדוקט',type:'number'},{k:'notes',label:'הערות',type:'textarea',full:1}];
+  openModal('פרטי דוקט #'+d.number,`<form id="frm" onsubmit="return false">${fieldsHTML(F,{...d,rUSD:R.USD||'',rEUR:R.EUR||''})}<p class="small muted">השער נקבע ביום פתיחת הדוקט ונשאר קבוע, כדי שהסכומים בשקלים לא ישתנו. שדות ריקים = לפי השער היומי.</p></form>`+actionsHTML('שמירה',`<button class="btn" id="rToday" type="button">עדכון לשער של היום</button>`));
+  $('#rToday').onclick=()=>{$('#f_rUSD').value=rate('USD');$('#f_rEUR').value=rate('EUR')};
+  $('#frmSave').onclick=async()=>{const o=readFields(F,$('#frm'));if(!o)return;const rates=(o.rUSD||o.rEUR)?{USD:+o.rUSD||rate('USD'),EUR:+o.rEUR||rate('EUR')}:null;delete o.rUSD;delete o.rEUR;closeModal();await saveRec('dockets',{...d,...o,rates})};
 }
 function vDocket(id){
   const d=S.dockets[id];if(!d)return `<div class="card empty">הדוקט לא נמצא.<div class="row" style="justify-content:center;margin-top:10px"><a class="btn" href="#dockets">לחיפוש דוקטים</a></div></div>`;
-  const k=dCalc(d),cur=k.cur,r=dRange(d),svcs=d.services||[];
+  const k=dCalc(d),cur=k.cur,R=d.rates,r=dRange(d),svcs=d.services||[];
   const pax=(d.passengers||[]).map(p=>S.customers[p]).filter(Boolean);
   const pays=vals('payments').filter(p=>p.docketId===id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const files=vals('files').filter(f=>f.docketId===id).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   const closed=d.status==='closed';
   return `<div class="dk">
   <aside class="dk-side">
@@ -640,28 +671,37 @@ function vDocket(id){
     <div class="dk-acts">
       <button data-act="editDocket" data-id="${id}">עריכת פרטי הדוקט</button>
       <button data-act="addPax" data-id="${id}">+ הוספת נוסע</button>
+      <label for="dkScan">+ סריקת דרכונים לנוסעים</label>
+      <label for="dkConf">+ העלאת אישור הזמנה (טיסה)</label>
       <button data-act="recForm" data-id="${id}">+ תקבול מהלקוח</button>
       <button data-act="pmtForm" data-id="${id}">+ תשלום לספק</button>
-      <button data-act="itinerary" data-id="${id}">מסלול לשליחה ללקוח</button>
+      <button data-act="msgForm" data-id="${id}" data-k="itinerary">הודעה ללקוח בוואטסאפ</button>
+      <button data-act="msgForm" data-id="${id}" data-k="balance">תזכורת תשלום</button>
+      <label for="dkFile">+ צירוף קובץ</label>
+      <button data-act="dupDocket" data-id="${id}">שכפול הדוקט</button>
       <button data-act="toggleClose" data-id="${id}">${closed?'פתיחת הדוקט מחדש':'סגירת הדוקט'}</button>
       <button data-act="newDocket">דוקט חדש</button>
       <button class="warn" data-act="delDocket" data-id="${id}">מחיקת הדוקט</button>
     </div>
+    <input type="file" id="dkScan" data-id="${id}" accept="image/*" multiple hidden>
+    <input type="file" id="dkConf" data-id="${id}" accept="application/pdf,image/*" hidden>
+    <input type="file" id="dkFile" data-id="${id}" multiple hidden>
   </aside>
   <section class="dk-main">
-    <div class="dk-bar"><div class="dates num">${r.start?`${fmtDate(r.start)} – ${fmtDate(r.end)} <span class="pill acc">${r.days} ימים</span>`:'<span class="muted">עוד אין תאריכים</span>'}</div><div class="small muted">מטבע הדוקט <b class="ltr">${cur}</b>${cur!=='NIS'?` · ${autoOn()?'יציג':'שער'} <span class="num">${rate(cur)}</span>`:''}</div></div>
+    <div class="dk-bar"><div class="dates num">${r.start?`${fmtDate(r.start)} – ${fmtDate(r.end)} <span class="pill acc">${r.days} ימים</span>`:'<span class="muted">עוד אין תאריכים</span>'}</div><div class="small muted">מטבע הדוקט <b class="ltr">${cur}</b> · ${R?'שער קבוע לדוקט':(autoOn()?'שער יציג יומי':'שער ידני')}: <span class="num ltr">$ ${rate('USD',R)} · € ${rate('EUR',R)}</span></div></div>
     <div class="card" style="padding:10px"><div class="small muted" style="margin-bottom:6px">הוספת שירות:</div><div class="svc-bar">${SVC.map(([t,l,c])=>`<button class="svc-btn" data-act="svcForm" data-id="${id}" data-t="${t}">${svcIc(t,'sm')}${l}</button>`).join('')}</div></div>
     <div class="tbl"><table class="svct"><thead><tr><th>#</th><th>שירות</th><th>נוסעים</th><th>תאריך התחלה</th><th>תאריך סיום</th><th>תיאור</th><th>PNR</th><th>סכום</th><th>סכום (${cur})</th><th>ספק</th></tr></thead><tbody>
-    ${svcs.length?svcs.map((s,i)=>{const c=svcCalc(s),st=SVC_ST[s.status]||SVC_ST.ok;return `<tr class="${s.status==='cancelled'?'cancelled':''}" data-act="svcForm" data-id="${id}" data-s="${s.id}"><td class="num">${i+1}</td><td><span class="svc-type">${svcIc(s.type,'sm')}${SVC_T[s.type]}</span> <span class="pill ${st[1]}">${st[0]}</span></td><td class="num">${(s.paxIds||[]).length||s.paxCount||''}</td><td class="num">${fmtDate(s.start)}</td><td class="num">${fmtDate(s.end)}</td><td class="desc" dir="auto">${esc(s.desc||'')}${s.type==='flight'&&s.segments?.length?`<span class="sub ltr">${s.segments.map(g=>`${esc(g.from||'')}→${esc(g.to||'')} ${esc(g.flight||'')}`).join(' · ')}</span>`:''}</td><td class="ltr">${esc(s.pnr||'')}</td><td>${amt(c.sell,s.currency||cur)}</td><td>${amt(conv(c.sell,s.currency||cur,cur),cur)}</td><td>${esc(supName(s.supplierId))}</td></tr>`}).join(''):`<tr><td colspan="10" class="empty">עוד אין שירותים. בוחרים סוג שירות למעלה.</td></tr>`}
+    ${svcs.length?svcs.map((s,i)=>{const c=svcCalc(s),st=SVC_ST[s.status]||SVC_ST.ok;return `<tr class="${s.status==='cancelled'?'cancelled':''}" data-act="svcForm" data-id="${id}" data-s="${s.id}"><td class="num">${i+1}</td><td><span class="svc-type">${svcIc(s.type,'sm')}${SVC_T[s.type]}</span> <span class="pill ${st[1]}">${st[0]}</span></td><td class="num">${(s.paxIds||[]).length||s.paxCount||''}${s.perPax?' <span class="pill acc" title="מחיר לפי נוסע">₪/נוסע</span>':''}</td><td class="num">${fmtDate(s.start)}</td><td class="num">${fmtDate(s.end)}</td><td class="desc" dir="auto">${esc(s.desc||'')}${s.type==='flight'&&s.segments?.length?`<span class="sub ltr">${s.segments.map(g=>`${esc(g.from||'')}→${esc(g.to||'')} ${esc(g.flight||'')}`).join(' · ')}</span>`:''}</td><td class="ltr">${esc(s.pnr||'')}</td><td>${amt(c.sell,s.currency||cur)}</td><td>${amt(conv(c.sell,s.currency||cur,cur,R),cur)}</td><td>${esc(supName(s.supplierId))}</td></tr>`}).join(''):`<tr><td colspan="10" class="empty">עוד אין שירותים. בוחרים סוג שירות למעלה, או מעלים אישור הזמנה.</td></tr>`}
     </tbody></table></div>
     <div class="grid2">
-      <div class="card"><div class="panel-h"><h2>נוסעים (${pax.length})</h2><button class="btn sm" data-act="addPax" data-id="${id}">+ להוסיף</button></div>
+      <div class="card"><div class="panel-h"><h2>נוסעים (${pax.length})</h2><span class="row"><label class="btn sm" for="dkScan">סריקת דרכונים</label><button class="btn sm" data-act="addPax" data-id="${id}">+ להוסיף</button></span></div>
         ${pax.length?`<div class="scrollx"><table><thead><tr><th>כינוי</th><th>שם נוסע</th><th>ת. לידה</th><th>גיל</th><th>דרכון</th><th></th></tr></thead><tbody>${pax.map(c=>`<tr><td>${esc(c.title||'')}</td><td><a href="#" data-act="openCustomer" data-id="${c.id}">${esc(custLabel(c))}</a><span class="sub">${esc(c.nameHe||'')}</span></td><td class="num">${fmtDate(c.dob)}</td><td class="num">${ageAt(c.dob,r.start)}</td><td>${passPill(c,r.end)}</td><td><button class="btn sm danger" data-act="removePax" data-id="${id}" data-c="${c.id}" aria-label="הסרת נוסע">הסרה</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="muted small">אין נוסעים</div>'}
       </div>
       <div class="card"><div class="panel-h"><h2>התחשבנות</h2><span class="row"><button class="btn sm" data-act="recForm" data-id="${id}">+ תקבול</button><button class="btn sm" data-act="pmtForm" data-id="${id}">+ תשלום לספק</button></span></div>
-        ${pays.length?`<div class="scrollx"><table><thead><tr><th>סוג</th><th>מסמך</th><th>תאריך</th><th>סכום</th><th>(${cur})</th><th>מאת / אל</th></tr></thead><tbody>${pays.map(p=>`<tr data-act="openPay" data-id="${p.id}" style="cursor:pointer"><td><span class="pill ${p.kind==='REC'?'ok':'pmt'}">${p.kind}</span></td><td class="num">${p.number}</td><td class="num">${fmtDate(p.date)}</td><td>${amt(p.amount,p.currency)}</td><td>${amt(conv(p.amount,p.currency,cur),cur)}</td><td>${esc(p.kind==='REC'?custName(p.payerId):supName(p.supplierId))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="muted small">אין מסמכים</div>'}
+        ${pays.length?`<div class="scrollx"><table><thead><tr><th>סוג</th><th>מסמך</th><th>תאריך</th><th>סכום</th><th>(${cur})</th><th>מאת / אל</th></tr></thead><tbody>${pays.map(p=>`<tr data-act="openPay" data-id="${p.id}" style="cursor:pointer"><td><span class="pill ${p.kind==='REC'?'ok':'pmt'}">${p.kind}</span></td><td class="num">${p.number}</td><td class="num">${fmtDate(p.date)}</td><td>${amt(p.amount,p.currency)}</td><td>${amt(conv(p.amount,p.currency,cur,R),cur)}</td><td>${esc(p.kind==='REC'?custName(p.payerId):supName(p.supplierId))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="muted small">אין מסמכים</div>'}
       </div>
     </div>
+    <div class="card"><div class="panel-h"><h2>קבצים מצורפים (${files.length})</h2><label class="btn sm" for="dkFile">+ צירוף קובץ</label></div>${filesHTML(files)}</div>
     <div class="dk-totals">
       <div><span>סך המכירות</span><b>${amt(k.sales,cur)}</b></div>
       <div><span>עלות ספקים</span><b>${amt(k.cost,cur)}</b></div>
@@ -683,18 +723,21 @@ const F_SVC_P=[
   {k:'currency',label:'מטבע',type:'select',options:CURS},{k:'base',label:'מחיר בסיס',type:'number'},{k:'tax',label:'מיסים / אחר',type:'number'},{k:'fee',label:'דמי שירות',type:'number'},
   {k:'commPct',label:'עמלת ספק %',type:'number'},{k:'sell',label:'מחיר מכירה ללקוח',type:'number'}
 ];
-function svcForm(did,sid,type){
+function paxType(c,at){const a=ageAt(c?.dob,at);if(a===''||a==null)return 'ADT';return a<2?'INF':a<12?'CHD':'ADT'}
+function svcForm(did,sid,type,pre){
   const d=S.dockets[did];if(!d)return;
-  const s=sid?clone((d.services||[]).find(x=>x.id===sid)):{id:newId(),type:type||'flight',status:'ok',currency:d.currency||'USD',paxIds:[...(d.passengers||[])],segments:[]};
+  const s=sid?clone((d.services||[]).find(x=>x.id===sid)):{id:newId(),type:type||'flight',status:'ok',currency:d.currency||'USD',paxIds:[...(d.passengers||[])],segments:[],...(pre||{})};
+  const note=s._note;delete s._note;
   if(s.type==='flight'&&!(s.segments||[]).length)s.segments=[{}];
   const FA=F_SVC_A.map(f=>f.k==='supplierId'?{...f,options:[['','— בחירה —'],...vals('suppliers').sort((a,b)=>a.name.localeCompare(b.name)).map(x=>[x.id,x.name])]}:f);
   const pax=(d.passengers||[]).map(p=>S.customers[p]).filter(Boolean);
-  openModal(`${sid?'עריכת':'הוספת'} שירות · דוקט #${d.number}`,`<form id="frm" onsubmit="return false">
+  let pp=clone(s.paxPrices||{});
+  openModal(`${sid?'עריכת':'הוספת'} שירות · דוקט #${d.number}`,`${note?`<div class="banner" style="background:var(--accent-soft);color:var(--accent)">${esc(note)}</div>`:''}<form id="frm" onsubmit="return false">
     ${fieldsHTML(FA,s,'form three')}
     <div class="fsec" id="segSec" ${s.type==='flight'?'':'hidden'}><h3>קטעי טיסה <button class="btn sm" id="segAdd" type="button">+ קטע</button></h3>
       <table class="segs"><thead><tr><th>מ-</th><th>אל</th><th>טיסה</th><th>תאריך</th><th>המראה</th><th>נחיתה</th><th></th></tr></thead><tbody id="segBody"></tbody></table></div>
     <div class="fsec"><h3>נוסעים בשירות</h3>${pax.length?`<div class="picks">${pax.map(c=>`<label><input type="checkbox" name="paxIds" value="${c.id}" ${(s.paxIds||[]).includes(c.id)?'checked':''}> ${esc(custLabel(c))}</label>`).join('')}</div>`:'<div class="muted small">אין עדיין נוסעים בדוקט. אפשר להוסיף מהדוקט.</div>'}</div>
-    <div class="fsec"><h3>מחיר</h3>${fieldsHTML(F_SVC_P,s,'form three')}<div class="calc" id="calc"></div></div>
+    <div class="fsec"><h3><span>מחיר</span><label class="small" style="display:flex;gap:6px;align-items:center;font-weight:600;cursor:pointer"><input type="checkbox" id="perPax" ${s.perPax?'checked':''}> מחיר לפי נוסע (מבוגר / ילד / תינוק)</label></h3>${fieldsHTML(F_SVC_P,s,'form three')}<div id="ppBox" style="margin-top:10px"></div><div class="calc" id="calc"></div></div>
   </form>`+actionsHTML('שמירה',sid?`<button class="btn danger" id="svcDel">מחיקת השירות</button>`:''),true);
   let segs=clone(s.segments||[]);
   const drawSegs=()=>{$('#segBody').innerHTML=segs.map((g,i)=>`<tr data-i="${i}"><td><input name="from" value="${esc(g.from||'')}" dir="ltr" placeholder="TLV" style="text-transform:uppercase"></td><td><input name="to" value="${esc(g.to||'')}" dir="ltr" placeholder="KRK" style="text-transform:uppercase"></td><td><input name="flight" value="${esc(g.flight||'')}" dir="ltr" placeholder="LY5119" style="text-transform:uppercase"></td><td><input type="date" name="date" value="${esc(g.date||'')}"></td><td><input type="time" name="dep" value="${esc(g.dep||'')}"></td><td><input type="time" name="arr" value="${esc(g.arr||'')}"></td><td><button class="btn sm danger" type="button" data-seg-del="${i}" aria-label="מחיקת קטע">×</button></td></tr>`).join('')};
@@ -703,14 +746,31 @@ function svcForm(did,sid,type){
   $('#segAdd').onclick=()=>{segs=readSegs();const last=segs[segs.length-1]||{};segs.push({from:last.to||'',date:last.date||''});drawSegs()};
   $('#segBody').onclick=e=>{const b=e.target.closest('[data-seg-del]');if(b){segs=readSegs();segs.splice(+b.dataset.segDel,1);drawSegs()}};
   $('#f_type').onchange=e=>{$('#segSec').hidden=e.target.value!=='flight';if(e.target.value==='flight'&&!readSegs().length){segs=[{}];drawSegs()}};
-  const calc=()=>{const o=readFields(F_SVC_P,$('#frm'))||{};const c=svcCalc(o),cu=o.currency||'';$('#calc').innerHTML=`<div><span>עלות כוללת</span><b>${amt(c.total,cu)}</b></div><div><span>עמלה</span><b>${amt(c.comm,cu)}</b></div><div><span>נטו לתשלום לספק</span><b>${amt(c.net,cu)}</b></div><div><span>מחיר מכירה</span><b>${amt(c.sell,cu)}</b></div><div class="hl"><span>רווח</span><b>${amt(c.profit,cu)}</b></div>`};
-  calc();$('#frm').addEventListener('input',e=>{if(F_SVC_P.some(f=>f.k===e.target.name))calc()});
+  const selPax=()=>[...document.querySelectorAll('#frm input[name=paxIds]:checked')].map(i=>i.value);
+  const readPP=()=>{document.querySelectorAll('#ppBox tr[data-c]').forEach(tr=>{const o={};tr.querySelectorAll('input').forEach(i=>o[i.name]=i.value===''?'':+i.value);pp[tr.dataset.c]=o})};
+  const drawPP=()=>{
+    const on=$('#perPax').checked;['base','tax','fee','sell'].forEach(k=>{$('#f_'+k).closest('label').hidden=on});
+    if(!on){$('#ppBox').innerHTML='';return}
+    const ids=selPax(),st=$('#f_start').value||dRange(d).start;
+    $('#ppBox').innerHTML=ids.length?`<table class="segs pp"><thead><tr><th>נוסע</th><th>סוג</th><th>מחיר בסיס</th><th>מיסים</th><th>דמי שירות</th><th>מחיר מכירה</th></tr></thead><tbody>${ids.map(cid=>{const c=S.customers[cid],p=pp[cid]||{};return `<tr data-c="${cid}"><td>${esc(custLabel(c))}</td><td><span class="pill ptype">${paxType(c,st)}</span></td>${['base','tax','fee','sell'].map(k=>`<td><input type="number" step="any" name="${k}" value="${esc(p[k]??'')}" aria-label="${k}"></td>`).join('')}</tr>`}).join('')}</tbody></table><button class="btn sm" type="button" id="ppCopy" style="margin-top:6px">העתקת השורה הראשונה מכל סוג לשאר הנוסעים מאותו סוג</button>`:'<div class="muted small">מסמנים נוסעים בשירות כדי לתמחר כל אחד.</div>';
+    const cp=$('#ppCopy');if(cp)cp.onclick=()=>{readPP();const first={};document.querySelectorAll('#ppBox tr[data-c]').forEach(tr=>{const t=tr.querySelector('.ptype').textContent;if(!first[t])first[t]=pp[tr.dataset.c];else pp[tr.dataset.c]={...first[t]}});drawPP();calc()};
+  };
+  const cur=()=>{readPP();const o=readFields(F_SVC_P,$('#frm'))||{};return {...o,perPax:$('#perPax').checked,paxPrices:pp,paxIds:selPax()}};
+  const calc=()=>{const o=cur(),c=svcCalc(o),cu=o.currency||'';$('#calc').innerHTML=`<div><span>עלות כוללת</span><b>${amt(c.total,cu)}</b></div><div><span>עמלה</span><b>${amt(c.comm,cu)}</b></div><div><span>נטו לתשלום לספק</span><b>${amt(c.net,cu)}</b></div><div><span>מחיר מכירה</span><b>${amt(c.sell,cu)}</b></div><div class="hl"><span>רווח</span><b>${amt(c.profit,cu)}</b></div>`};
+  drawPP();calc();
+  $('#frm').addEventListener('input',e=>{if(e.target.closest('#ppBox')||F_SVC_P.some(f=>f.k===e.target.name))calc()});
+  $('#frm').addEventListener('change',e=>{if(e.target.name==='paxIds'||e.target.id==='perPax'){readPP();
+    if(e.target.id==='perPax'&&e.target.checked){const ids=selPax(),empty=ids.every(id=>!pp[id]||['base','tax','fee','sell'].every(k=>pp[id][k]===''||pp[id][k]==null));
+      if(ids.length&&empty){const o=readFields(F_SVC_P,$('#frm'))||{},sp=v=>v===''||v==null?'':Math.round(+v/ids.length*100)/100;ids.forEach(id=>{pp[id]={base:sp(o.base),tax:sp(o.tax),fee:sp(o.fee),sell:sp(o.sell)}})}}
+    drawPP();calc()}});
   if(sid)$('#svcDel').onclick=async()=>{if(!(await confirmBox('למחוק את השירות מהדוקט?','מחיקה')))return svcForm(did,sid);const nd=clone(S.dockets[did]);nd.services=(nd.services||[]).filter(x=>x.id!==sid);await saveRec('dockets',nd)};
   $('#frmSave').onclick=async()=>{
     const a=readFields(FA,$('#frm')),p=readFields(F_SVC_P,$('#frm'));if(!a||!p)return;
     let supplierId=a.supplierId;const ns=a.newSupplier;delete a.newSupplier;
     if(ns){const ex=vals('suppliers').find(x=>x.name.trim().toLowerCase()===ns.toLowerCase());if(ex)supplierId=ex.id;else{const rec={id:newId(),name:ns,stype:a.type==='flight'?'חברת תעופה':a.type==='hotel'?'בית מלון':'סיטונאי',createdAt:Date.now()};await saveRec('suppliers',rec);supplierId=rec.id}}
-    const rec={...s,...a,...p,supplierId,paxIds:[...document.querySelectorAll('#frm input[name=paxIds]:checked')].map(i=>i.value)};
+    const paxIds=selPax(),perPax=$('#perPax').checked;readPP();
+    const rec={...s,...a,...p,supplierId,paxIds,perPax};delete rec.newSupplier;
+    rec.paxPrices=perPax?Object.fromEntries(paxIds.map(id=>[id,pp[id]||{}])):{};
     rec.segments=rec.type==='flight'?readSegs().filter(g=>g.from||g.to||g.flight||g.date):[];
     if(rec.type==='flight'&&rec.segments.length){const ds=rec.segments.map(g=>g.date).filter(Boolean).sort();if(!rec.start)rec.start=ds[0]||'';if(!rec.end)rec.end=ds[ds.length-1]||rec.start;if(!rec.desc)rec.desc=rec.segments.map(g=>`${g.from}→${g.to}`).join(' · ')}
     if(!rec.start){toast('חסר: תאריך התחלה');return}
@@ -718,9 +778,9 @@ function svcForm(did,sid,type){
     closeModal();await saveRec('dockets',nd);toast('השירות נשמר');
   };
 }
-function itinerary(id){
-  const d=S.dockets[id],r=dRange(d),k=dCalc(d);
-  const lines=[`שלום ${custName(d.customerId)!=='—'?custName(d.customerId):''},`,`פרטי הנסיעה שלך (תיק ${d.number}):`,''];
+function itineraryText(d){
+  const k=dCalc(d);
+  const lines=[`פרטי הנסיעה שלך (תיק ${d.number}):`,''];
   (d.services||[]).filter(s=>s.status!=='cancelled').sort((a,b)=>(a.start||'').localeCompare(b.start||'')).forEach(s=>{
     if(s.type==='flight'&&s.segments?.length)s.segments.forEach(g=>lines.push(`✈ ${fmtDate(g.date)} ${g.flight||''} ${g.from||''}→${g.to||''} ${g.dep?'המראה '+g.dep:''}${g.arr?' נחיתה '+g.arr:''}${s.pnr?' · PNR '+s.pnr:''}`));
     else lines.push(`• ${SVC_T[s.type]}: ${s.desc||''} ${fmtDate(s.start)}${s.end&&s.end!==s.start?' עד '+fmtDate(s.end):''}${s.ref?' · אסמכתא '+s.ref:''}`);
@@ -728,7 +788,7 @@ function itinerary(id){
   lines.push('');lines.push('נוסעים: '+(d.passengers||[]).map(custName).join(', '));
   if(k.bal>0.5)lines.push(`יתרה לתשלום: ${n2(k.bal)} ${k.cur}`);
   lines.push('');lines.push('נסיעה טובה!');lines.push(S.meta.bizName||'ZVI MYKOFF');
-  openModal('מסלול לשליחה ללקוח',`<textarea id="itx" style="width:100%;min-height:260px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink)">${esc(lines.join('\n'))}</textarea><div class="actions"><button class="btn pri" data-act="copy" data-src="itx">העתקה</button></div>`);
+  return lines.join('\n');
 }
 
 /* ---------- payments ---------- */
@@ -746,7 +806,7 @@ function pmtForm(did,sup){
   const others=vals('suppliers').filter(s=>!inDk.includes(s.id)).sort((a,b)=>a.name.localeCompare(b.name)).map(s=>s.id);
   const ids=[...inDk,...others];if(!ids.length)return toast('אין עדיין ספקים. מוסיפים ספק בשירות או במסך ספקים');
   const sel=sup||ids[0];
-  const dueFor=sid=>{if(!d)return Math.max(0,supplierBalance(sid).bal);let n=0;(d.services||[]).forEach(s=>{if(s.supplierId===sid&&s.status!=='cancelled')n+=conv(svcCalc(s).net,s.currency||d.currency,d.currency)});const paid=vals('payments').filter(p=>p.kind==='PMT'&&p.docketId===d.id&&p.supplierId===sid).reduce((a,p)=>a+conv(p.amount,p.currency,d.currency),0);return Math.max(0,n-paid)};
+  const dueFor=sid=>d?supOwedInDocket(d,sid):Math.max(0,supplierBalance(sid).bal);
   const F=[{k:'supplierId',label:'ספק',type:'select',options:ids.map(i=>[i,supName(i)]),def:sel},{k:'amount',label:'סכום',type:'number',req:1,def:Math.round(dueFor(sel)*100)/100||''},{k:'currency',label:'מטבע',type:'select',options:CURS,def:d?d.currency:'NIS'},{k:'date',label:'תאריך',type:'date',def:todayISO()},{k:'method',label:'אמצעי תשלום',type:'select',options:METHODS},{k:'note',label:'הערה',full:1}];
   openModal('תשלום לספק'+(d?' · דוקט #'+d.number:''),`<form id="frm" onsubmit="return false">${fieldsHTML(F,{})}</form>`+actionsHTML('שמירה'));
   $('#f_supplierId').onchange=e=>{$('#f_amount').value=Math.round(dueFor(e.target.value)*100)/100||''};
@@ -767,7 +827,7 @@ function openPay(id){
       <tr><td>סכום</td><td class="tot">${amt(p.amount,p.currency)}</td></tr>
     </tbody></table></div>
     <textarea id="rtx" hidden>${esc(receiptText(p))}</textarea>
-    <div class="actions"><button class="btn pri" data-act="print">הדפסה / שמירה כ-PDF</button><button class="btn" data-act="copy" data-src="rtx">העתקה כטקסט</button>${d?`<button class="btn" data-act="goDocket" data-id="${d.id}">לדוקט</button>`:''}<button class="btn danger" data-act="delPay" data-id="${id}">ביטול הקבלה</button></div>`);
+    <div class="actions"><button class="btn pri" data-act="print">הדפסה / שמירה כ-PDF</button><a class="btn" target="_blank" rel="noopener" href="${waUrl(c.phone,receiptText(p))}">שליחה בוואטסאפ</a><button class="btn" data-act="copy" data-src="rtx">העתקה כטקסט</button>${d?`<button class="btn" data-act="goDocket" data-id="${d.id}">לדוקט</button>`:''}<button class="btn danger" data-act="delPay" data-id="${id}">ביטול הקבלה</button></div>`);
 }
 
 /* ---------- leads & debts ---------- */
@@ -796,26 +856,275 @@ function debtPayForm(id){
   $('#frmSave').onclick=async()=>{const o=readFields(F,$('#frm'));if(!o)return;const n=clone(d);n.payments=[...(n.payments||[]),o];closeModal();await saveRec('debts',n);toast('התשלום נרשם');openDebt(id)};
 }
 
+
+/* ---------- messages & WhatsApp ---------- */
+const DEF_TPL=[
+ ['itinerary','מסלול הנסיעה','שלום {שם},\n{מסלול}'],
+ ['balance','תזכורת תשלום','שלום {שם},\nתזכורת: בתיק {דוקט} נותרה יתרה לתשלום של {יתרה}.\nאפשר לשלם בהעברה בנקאית, בביט או בכרטיס אשראי. תודה!\n{עסק}'],
+ ['tomorrow','טיסה מחר','שלום {שם},\nתזכורת: הטיסה שלך יוצאת ב-{תאריך}.\n{טיסות}\nמספר הזמנה: {PNR}\nמומלץ להגיע לשדה 3 שעות לפני ההמראה ולבדוק שהדרכון בתוקף.\nנסיעה טובה!\n{עסק}'],
+ ['passport','בקשת צילום דרכון','שלום {שם},\nכדי להשלים את ההזמנה, אפשר לשלוח צילום ברור של עמוד הפרטים בדרכון של כל הנוסעים?\nתודה,\n{עסק}'],
+ ['receipt','אישור קבלת תשלום','שלום {שם},\nקיבלנו את התשלום עבור תיק {דוקט}, תודה רבה!\nיתרה לתשלום: {יתרה}\n{עסק}']
+];
+const tplText=k=>{const m=(S.meta.templates||{})[k];return m!=null&&m!==''?m:(DEF_TPL.find(x=>x[0]===k)||['','',''])[2]};
+function waUrl(phone,text){const d=String(phone||'').replace(/\D/g,'');const n=d?(d.startsWith('0')?'972'+d.slice(1):d):'';return `https://wa.me/${n}?text=${encodeURIComponent(text||'')}`}
+function msgText(key,d,cid){
+  const k=dCalc(d),c=S.customers[cid]||S.customers[d.customerId]||{};
+  const segs=[];(d.services||[]).forEach(s=>{if(s.type==='flight'&&s.status!=='cancelled')(s.segments||[]).forEach(g=>segs.push(g))});segs.sort((a,b)=>((a.date||'')+(a.dep||'')).localeCompare((b.date||'')+(b.dep||'')));
+  const t=todayISO(),next=segs.find(g=>(g.date||'')>=t)||segs[0];
+  const pnrs=[...new Set((d.services||[]).map(s=>s.pnr).filter(Boolean))].join(', ');
+  const first=c.nameHe?c.nameHe.split(' ')[0]:(c.firstName?c.firstName[0]+c.firstName.slice(1).toLowerCase():'');
+  const map={'{שם}':first,'{דוקט}':String(d.number),'{יתרה}':`${n2(Math.max(0,k.bal))} ${k.cur}`,'{תאריך}':fmtDate(next?.date||dRange(d).start),'{טיסות}':segs.filter(g=>!next||g.date===next.date).map(g=>`✈ ${g.flight||''} ${g.from||''}→${g.to||''} ${g.dep?'המראה '+g.dep:''}`).join('\n'),'{PNR}':pnrs||'—','{מסלול}':itineraryText(d),'{עסק}':S.meta.bizName||'ZVI MYKOFF'};
+  return tplText(key).replace(/\{[^}]+\}/g,m=>map[m]??m);
+}
+function messageForm(did,key){
+  const d=S.dockets[did];if(!d)return;const people=[...new Set([d.customerId,...(d.passengers||[])].filter(Boolean))];
+  openModal('הודעה ללקוח · דוקט #'+d.number,`<div class="form"><label for="mTpl">תבנית<select id="mTpl">${DEF_TPL.map(([k,l])=>`<option value="${k}" ${k===key?'selected':''}>${l}</option>`).join('')}</select></label><label for="mTo">נמען<select id="mTo">${people.map(p=>`<option value="${p}">${esc(custName(p))} · ${esc(S.customers[p]?.phone||'אין טלפון')}</option>`).join('')||'<option value="">בלי נמען</option>'}</select></label><label class="full" for="mTxt">ההודעה (אפשר לערוך)<textarea id="mTxt" style="min-height:230px"></textarea></label></div><div class="actions"><a class="btn pri" id="mWa" target="_blank" rel="noopener">שליחה בוואטסאפ</a><button class="btn" data-act="copy" data-src="mTxt">העתקה</button></div><p class="small muted">את נוסח התבניות אפשר לשנות במסך גיבוי והגדרות.</p>`);
+  const link=()=>{$('#mWa').href=waUrl(S.customers[$('#mTo').value]?.phone,$('#mTxt').value)};
+  const upd=()=>{$('#mTxt').value=msgText($('#mTpl').value,d,$('#mTo').value);link()};
+  $('#mTpl').onchange=upd;$('#mTo').onchange=upd;$('#mTxt').oninput=link;upd();
+}
+
+/* ---------- attached files ---------- */
+const CHUNK=700000;
+function fileToB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]||'');r.onerror=rej;r.readAsDataURL(file)})}
+async function uploadFiles(files,link,quiet){
+  let ok=0;
+  for(const f of files){
+    if(f.size>15*1024*1024){toast(`${f.name} גדול מדי (עד 15MB)`);continue}
+    if(!quiet)toast('מעלה '+f.name+'…');
+    try{const b64=await fileToB64(f),id=newId(),n=Math.max(1,Math.ceil(b64.length/CHUNK));
+      for(let i=0;i<n;i++)await backend.saveChunk({id:id+'_'+i,fileId:id,i,data:b64.slice(i*CHUNK,(i+1)*CHUNK)});
+      await saveRec('files',{id,name:f.name,type:f.type||'application/octet-stream',size:f.size,chunks:n,...link,createdAt:Date.now()});ok++}
+    catch(e){handleErr(e)}
+  }
+  if(ok&&!quiet)toast(ok>1?`${ok} קבצים נשמרו`:'הקובץ נשמר');
+}
+async function openFile(id){
+  const m=S.files[id];if(!m)return;toast('מוריד את '+m.name+'…');
+  try{const parts=(await backend.getChunks(id)).sort((a,b)=>a.i-b.i);const bin=atob(parts.map(p=>p.data).join(''));const u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([u8],{type:m.type}));const a=document.createElement('a');a.href=url;a.download=m.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000)}
+  catch(e){toast('לא הצלחתי לפתוח את הקובץ')}
+}
+async function delFileRec(id){const m=S.files[id];try{await backend.delChunks(id,m?.chunks||0)}catch(e){}await removeRec('files',id)}
+const fileTag=f=>{const x=(f.name.split('.').pop()||'').slice(0,4).toUpperCase();return `<span class="fileic">${esc(x||'FILE')}</span>`};
+const filesHTML=list=>list.length?`<div class="list">${list.map(f=>`<div class="li"><span data-act="openFile" data-id="${f.id}" style="flex:1;display:flex;align-items:center">${fileTag(f)}<span>${esc(f.name)}<span class="sub">${f.size>1048576?(f.size/1048576).toFixed(1)+' MB':Math.max(1,Math.round(f.size/1024))+' KB'} · ${fmtDate(new Date(f.createdAt).toISOString().slice(0,10))}</span></span></span><button class="btn sm danger" data-act="delFile" data-id="${f.id}">מחיקה</button></div>`).join('')}</div>`:'<div class="muted small">אין קבצים</div>';
+
+/* ---------- batch passport scan ---------- */
+async function scanPassportsInto(did,files){
+  if(!window.MRZ)return toast('רכיב הסריקה לא נטען. רענן את הדף');
+  const rows=[...files].map(f=>({f,st:'ממתין'}));
+  const draw=()=>{const b=$('#batchList');if(b)b.innerHTML=rows.map(r=>`<div class="li" style="cursor:default"><span>${esc(r.f.name)}<span class="sub">${esc(r.st)}</span></span>${r.ok?'<span class="pill ok">נוסף</span>':r.err?'<span class="pill bad">לא נקרא</span>':''}</div>`).join('')};
+  openModal(`סריקת ${rows.length} דרכונים`,`<div class="list" id="batchList"></div><div id="batchEnd"></div><div class="actions"><button class="btn" data-act="closeModal">סגירה</button></div>`);draw();
+  const added=[];
+  for(const r of rows){
+    r.st='קורא…';draw();
+    try{
+      const p=await MRZ.scan(r.f,(pr,t)=>{r.st=(t||'קורא')+(pr?` ${Math.round(pr*100)}%`:'');draw()});
+      if(!p||!p.passportNo){r.err=1;r.st='לא הצלחתי לקרוא. כדאי לצלם שוב או להוסיף ידנית.';draw();continue}
+      const idOk=p.nationality==='ISR'&&isIsraeliId(p.personal),idn=idOk?p.personal.padStart(9,'0'):'';
+      let c=vals('customers').find(x=>x.passportNo===p.passportNo||(idn&&x.idNum===idn));
+      const photo=await shrink(r.f,1100,.72).catch(()=>'');
+      if(!c){c={id:newId(),title:p.sex==='F'?'MRS':'MR',lastName:p.surname||'',firstName:p.given||'',nameHe:'',idNum:idn,dob:p.dob,passportNo:p.passportNo,passportExp:p.passportExpiry,citizenship:p.nationality==='ISR'?'Israeli':p.nationality,country:p.nationality==='ISR'?'Israel':'',photo,createdAt:Date.now()};await saveRec('customers',c);r.st='לקוח חדש: '+custLabel(c)}
+      else{await saveRec('customers',{...clone(c),passportNo:p.passportNo,passportExp:p.passportExpiry||c.passportExp,photo:photo||c.photo});r.st='לקוח קיים: '+custLabel(c)+' (הדרכון עודכן)'}
+      added.push(c.id);r.ok=1;draw();
+    }catch(e){r.err=1;r.st='הסריקה נכשלה. בדוק את החיבור לאינטרנט.';draw()}
+  }
+  if(added.length){
+    const nd=clone(S.dockets[did]);nd.passengers=[...new Set([...(nd.passengers||[]),...added])];
+    if(!nd.customerId)nd.customerId=added[0];if(/^דוקט \d+$/.test(nd.title||''))nd.title=custLabel(S.customers[added[0]]);
+    (nd.services||[]).forEach(s=>{if(s.status!=='cancelled')s.paxIds=[...new Set([...(s.paxIds||[]),...added])]});
+    await saveRec('dockets',nd);
+  }
+  const e=$('#batchEnd');if(e)e.innerHTML=`<p class="small muted">${added.length} נוסעים נוספו לדוקט. ללקוחות חדשים חסר שם בעברית, אפשר להשלים בכרטיס הלקוח.</p>`;
+}
+
+/* ---------- booking confirmation reader ---------- */
+const AIRLINES={LY:'אל על',IZ:'ארקיע','6H':'ישראייר',W6:'Wizz Air',W4:'Wizz Air',W9:'Wizz Air',FR:'Ryanair',U2:'easyJet',TK:'Turkish Airlines',PC:'Pegasus',A3:'Aegean',OA:'Olympic Air',LH:'Lufthansa',LX:'Swiss',OS:'Austrian',SN:'Brussels Airlines',AF:'Air France',KL:'KLM',BA:'British Airways',IB:'Iberia',VY:'Vueling',AZ:'ITA Airways',TP:'TAP Portugal',LO:'LOT',RO:'TAROM',FB:'Bulgaria Air',JU:'Air Serbia',BT:'airBaltic',AY:'Finnair',SK:'SAS',DY:'Norwegian',UA:'United',DL:'Delta',AA:'American Airlines',AC:'Air Canada',EK:'Emirates',FZ:'flydubai',EY:'Etihad',QR:'Qatar Airways',ET:'Ethiopian',MS:'EgyptAir',RJ:'Royal Jordanian',G9:'Air Arabia',GF:'Gulf Air',WY:'Oman Air',PS:'UIA',HY:'Uzbekistan Airways',KC:'Air Astana',CA:'Air China',HU:'Hainan Airlines',CX:'Cathay Pacific',SQ:'Singapore Airlines',TG:'Thai Airways',AI:'Air India',VS:'Virgin Atlantic',EW:'Eurowings','4U':'Eurowings',X3:'TUIfly',HV:'Transavia',TO:'Transavia',BJ:'Nouvelair',QS:'Smartwings',ZB:'Air Albania',BY:'TUI',LS:'Jet2',EN:'Air Dolomiti',DE:'Condor',UX:'Air Europa',NO:'Neos',BM:'Bluebird',H4:'HiSky',FI:'Icelandair',EI:'Aer Lingus'};
+const MON={JAN:1,FEB:2,MAR:3,APR:4,MAY:5,JUN:6,JUL:7,AUG:8,SEP:9,OCT:10,NOV:11,DEC:12};
+const HEMON={'ינואר':1,'פברואר':2,'מרץ':3,'מרס':3,'אפריל':4,'מאי':5,'יוני':6,'יולי':7,'אוגוסט':8,'ספטמבר':9,'אוקטובר':10,'נובמבר':11,'דצמבר':12};
+const STOPW=new Set('THE AND FOR PNR REF YOU ARE NOT ALL ANY CAN WEB APP VAT TAX FEE USD EUR ILS NIS GMT UTC MRS MSTR MISS CHD INF ADT PAX SEAT BAG DEP ARR NON STOP ONE WAY OUT RET YES ECO BUS VIA AIR JET NEW KG PCS TKT REC LOC MON TUE WED THU FRI SAT SUN TEL FAX WWW COM PDF DATE TIME FROM HRS MIN CET EET OPS OPERATED CLASS'.split(' '));
+function mkDate(y,m,d){y=+y;if(y<100)y+=2000;m=+m;d=+d;if(!(m>=1&&m<=12&&d>=1&&d<=31&&y>2000))return '';return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
+function guessYear(m,d){const t=todayISO(),y=+t.slice(0,4);let iso=mkDate(y,m,d);if(iso&&iso<addDays(t,-60))iso=mkDate(y+1,m,d);return iso}
+function findDate(s){
+  let m;
+  if(m=s.match(/\b(20\d{2})-(\d{1,2})-(\d{1,2})\b/))return mkDate(m[1],m[2],m[3]);
+  if(m=s.match(/\b(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})\b/))return mkDate(m[3],m[2],m[1]);
+  if(m=s.match(/\b(\d{1,2})\s?(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[A-Z]*\.?,?\s?(\d{4}|\d{2})?\b/i)){const mo=MON[m[2].toUpperCase()];return m[3]?mkDate(m[3],mo,m[1]):guessYear(mo,m[1])}
+  if(m=s.match(/\b(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[A-Z]*\.?\s(\d{1,2}),?\s(\d{4})\b/i))return mkDate(m[3],MON[m[1].toUpperCase()],m[2]);
+  for(const [k,v] of Object.entries(HEMON)){const r=new RegExp('(\\d{1,2})\\s*ב?'+k+'\\s*(\\d{4})?');if(m=s.match(r))return m[2]?mkDate(m[2],v,m[1]):guessYear(v,m[1])}
+  return '';
+}
+function parseBooking(text){
+  const lines=String(text||'').split(/\r?\n/).map(l=>l.replace(/\s+/g,' ').trim()).filter(Boolean);
+  const U=lines.map(l=>l.toUpperCase()),all=U.join('\n');
+  let pnr='';const pm=all.match(/(?:PNR|BOOKING\s*(?:REFERENCE|REF\.?|CODE|NUMBER)|RESERVATION\s*(?:CODE|NUMBER)|CONFIRMATION\s*(?:CODE|NUMBER)|RECORD\s*LOCATOR|קוד\s*הזמנה|מספר\s*הזמנה|אסמכתא)\s*[:#.\-]?\s*([A-Z0-9]{5,8})\b/);
+  if(pm&&/[A-Z]/.test(pm[1]))pnr=pm[1];
+  const segs=[],seen=new Set();let airline='';
+  U.forEach((l,i)=>{
+    const re=/\b([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?-?\s?(\d{2,4})\b/g;let m;
+    while((m=re.exec(l))){
+      const code=m[1];if(!AIRLINES[code]&&!/FLIGHT|טיסה/.test(l))continue;
+      const fl=code+m[2];
+      const apsOf=win=>{const pair=win.match(/\b([A-Z]{3})\s?(?:-|–|→|>|\bTO\b)\s?([A-Z]{3})\b/);if(pair&&!STOPW.has(pair[1])&&!STOPW.has(pair[2]))return [pair[1],pair[2]];const par=[...win.matchAll(/\(([A-Z]{3})\)/g)].map(x=>x[1]);const plain=[...win.matchAll(/\b([A-Z]{3})\b/g)].map(x=>x[1]).filter(x=>!STOPW.has(x)&&!MON[x]);return [...new Set(par.length>=2?par:[...par,...plain])]};
+      const tmsOf=win=>[...win.matchAll(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g)].map(x=>x[1].padStart(2,'0')+':'+x[2]);
+      const wins=[U[i],U.slice(i,i+3).join(' '),U.slice(Math.max(0,i-1),i+3).join(' ')];
+      const aps=wins.map(apsOf).find(a=>a.length>=2)||apsOf(wins[2]);
+      const tms=wins.map(tmsOf).find(a=>a.length)||[];
+      const date=findDate(lines[i])||findDate(lines.slice(i,i+3).join(' '))||findDate(lines.slice(Math.max(0,i-1),i+3).join(' '));
+      const key=fl+date;if(seen.has(key))break;seen.add(key);
+      segs.push({flight:fl,from:aps[0]||'',to:aps[1]||'',date,dep:tms[0]||'',arr:tms[1]||''});
+      if(!airline)airline=AIRLINES[code]||'';
+      break;
+    }
+  });
+  const names=[];for(const m of all.matchAll(/\b([A-Z][A-Z'\-]+(?: [A-Z][A-Z'\-]+)?)\s?\/\s?([A-Z][A-Z\- ]*?[A-Z])(?:\s?(MR|MRS|MS|MSTR|MISS|CHD|INF))?\b/g)){const n={last:m[1].trim(),first:m[2].replace(/\s+(MR|MRS|MS|MSTR|MISS)$/,'').trim()};if(!names.some(x=>x.last===n.last&&x.first===n.first))names.push(n)}
+  return {pnr,segments:segs.sort((a,b)=>((a.date||'')+(a.dep||'')).localeCompare((b.date||'')+(b.dep||''))),names,airline};
+}
+function loadScript(src){return new Promise((res,rej)=>{if([...document.scripts].some(s=>s.src===src&&s.dataset.ok))return res();const s=document.createElement('script');s.src=src;s.onload=()=>{s.dataset.ok=1;res()};s.onerror=()=>rej(new Error('load'));document.head.appendChild(s)})}
+let ocrWorker=null;
+async function ocr(img,say){say&&say('קורא את המסמך…');if(!window.Tesseract)await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');if(!ocrWorker)ocrWorker=await Tesseract.createWorker('eng');const r=await ocrWorker.recognize(img);return r.data.text||''}
+async function fileText(file,say){
+  if(/pdf/i.test(file.type)||/\.pdf$/i.test(file.name)){
+    say&&say('פותח את ה-PDF…');
+    await loadScript('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;let out='';
+    for(let n=1;n<=Math.min(pdf.numPages,8);n++){const pg=await pdf.getPage(n),tc=await pg.getTextContent(),rows={};
+      tc.items.forEach(it=>{const y=Math.round(it.transform[5]/3);(rows[y]=rows[y]||[]).push(it)});
+      out+=Object.keys(rows).sort((a,b)=>b-a).map(y=>rows[y].sort((a,b)=>a.transform[4]-b.transform[4]).map(i=>i.str).join(' ')).join('\n')+'\n'}
+    if(out.replace(/\s/g,'').length>60)return out;
+    const pg=await pdf.getPage(1),vp=pg.getViewport({scale:2.2}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;return ocr(c,say);
+  }
+  return ocr(file,say);
+}
+async function readConfirmation(did,file){
+  openModal('קריאת אישור הזמנה',`<p id="cfMsg">קורא את ${esc(file.name)}…</p>`);
+  const say=t=>{const e=$('#cfMsg');if(e)e.textContent=t};
+  let text='';try{text=await fileText(file,say)}catch(e){say('לא הצלחתי לפתוח את הקובץ. אפשר לנסות צילום מסך של האישור.');return}
+  uploadFiles([file],{docketId:did},true);
+  const r=parseBooking(text);
+  if(!r.segments.length&&!r.pnr){say('לא מצאתי פרטי טיסה בקובץ. הקובץ נשמר בקבצים של הדוקט, ואפשר להוסיף את הטיסה ידנית.');return}
+  const d=S.dockets[did],norm=s=>String(s||'').toUpperCase().replace(/[^A-Z]/g,'');
+  const matched=[],missing=[];
+  r.names.forEach(n=>{const c=(d.passengers||[]).map(p=>S.customers[p]).find(c=>c&&norm(c.lastName)===norm(n.last)&&norm(n.first).startsWith(norm(c.firstName).slice(0,3)));if(c)matched.push(c.id);else missing.push(n.last+'/'+n.first)});
+  const al=(r.airline||'').toLowerCase();
+  const sup=al?vals('suppliers').find(s=>{const nm=s.name.toLowerCase();return nm.includes(al)||al.includes(nm)}):null;
+  const pre={pnr:r.pnr,segments:r.segments.length?r.segments:[{}],paxIds:matched.length?[...new Set(matched)]:[...(d.passengers||[])],...(sup?{supplierId:sup.id}:r.airline?{newSupplier:r.airline}:{}),
+    _note:`נקרא מהקובץ ${file.name}: ${r.segments.length} קטעי טיסה${r.pnr?', PNR '+r.pnr:''}. כדאי לבדוק את הפרטים ולהשלים מחיר.${missing.length?' נוסעים באישור שלא נמצאו בדוקט: '+missing.join(', ')+'.':''}`};
+  svcForm(did,null,'flight',pre);
+}
+
+/* ---------- duplicate docket ---------- */
+function dupDocketForm(id){
+  const d=S.dockets[id],r=dRange(d);
+  openModal('שכפול דוקט #'+d.number,`<form id="frm" class="form" onsubmit="return false"><label for="dupStart">תאריך יציאה חדש<input type="date" id="dupStart" value="${r.start||''}"></label><label for="dupPax" style="flex-direction:row;align-items:center;gap:8px;margin-top:22px;cursor:pointer"><input type="checkbox" id="dupPax" checked> להעתיק גם את הנוסעים</label></form><p class="small muted">כל השירותים יועתקו, והתאריכים יוזזו לפי התאריך החדש. PNR, מספרי הזמנה, תשלומים וקבלות לא מועתקים.</p>`+actionsHTML('שכפול'));
+  $('#frmSave').onclick=async()=>{
+    const ns=$('#dupStart').value,shift=(r.start&&ns)?daysBetween(r.start,ns):0,mv=x=>x?addDays(x,shift):x,keep=$('#dupPax').checked;
+    const number=await nextNo('docketNo',1006000);
+    const nd={...clone(d),id:newId(),number,status:'open',openDate:todayISO(),rates:todayRates(),createdAt:Date.now(),paymentDue:'',passengers:keep?[...(d.passengers||[])]:[],
+      services:(d.services||[]).filter(s=>s.status!=='cancelled').map(s=>({...clone(s),id:newId(),status:'ok',pnr:'',ref:'',start:mv(s.start),end:mv(s.end),supDue:mv(s.supDue),segments:(s.segments||[]).map(g=>({...g,date:mv(g.date)})),paxIds:keep?(s.paxIds||[]):[],paxPrices:keep?(s.paxPrices||{}):{}}))};
+    closeModal();await saveRec('dockets',nd);location.hash='d-'+nd.id;toast('הדוקט שוכפל: #'+number);
+  };
+}
+
+/* ---------- alerts ---------- */
+let ALERTS=[];
+function alerts(){
+  const t=todayISO(),tm=addDays(t,1),out=[];
+  vals('dockets').forEach(d=>{if(d.status==='closed')return;const k=dCalc(d),sub=`#${d.number} ${d.title||''}`,sups=new Set();
+    (d.services||[]).forEach(s=>{if(s.status==='cancelled')return;
+      if(s.type==='flight')(s.segments?.length?s.segments:[{date:s.start}]).forEach(g=>{if(g.date===t||g.date===tm)out.push({lvl:'acc',o:0,txt:`${g.date===t?'היום':'מחר'}: טיסה ${g.flight||''} ${g.from||''}→${g.to||''} ${g.dep||''}`,sub,id:d.id})});
+      if(s.supDue&&s.supplierId&&s.supDue<=addDays(t,3)&&!sups.has(s.supplierId)){sups.add(s.supplierId);const left=supOwedInDocket(d,s.supplierId);if(left>0.5)out.push({lvl:s.supDue<t?'bad':'warn',o:1,txt:`תשלום לספק ${supName(s.supplierId)}: ${n2(left)} ${d.currency} ${s.supDue<t?'באיחור (מ-'+fmtDate(s.supDue)+')':'עד '+fmtDate(s.supDue)}`,sub,id:d.id})}
+    });
+    if(d.paymentDue&&d.paymentDue<=t&&k.bal>0.5)out.push({lvl:'bad',o:1,txt:`הלקוח חייב ${n2(k.bal)} ${k.cur}. מועד התשלום (${fmtDate(d.paymentDue)}) עבר`,sub,id:d.id});
+    const r=dRange(d);if(r.end&&r.end>=t&&r.start<=addDays(t,60))(d.passengers||[]).forEach(p=>{const c=S.customers[p];if(c&&(!c.passportExp||c.passportExp<addMonths(r.end,6)))out.push({lvl:'warn',o:2,txt:`דרכון של ${custLabel(c)}: ${c.passportExp?'בתוקף עד '+fmtDate(c.passportExp)+', פחות מחצי שנה אחרי החזרה':'חסר תוקף'}`,sub,id:d.id})});
+  });
+  return out.sort((a,b)=>a.o-b.o);
+}
+function alertsCard(){
+  const al=ALERTS,perm=('Notification' in window)?Notification.permission:'na';
+  return `<div class="card" style="margin-bottom:14px"><h2><span>התראות ${al.length?`<span class="pill bad">${al.length}</span>`:''}</span>${perm==='default'?'<button class="btn sm" data-act="enableNotif">הפעלת התראות בדפדפן</button>':''}</h2>${al.length?`<div class="list">${al.map(a=>`<div class="li" data-act="goDocket" data-id="${a.id}"><span style="display:flex;align-items:baseline"><i class="al-dot ${a.lvl}"></i><span>${esc(a.txt)}<span class="sub">${esc(a.sub)}</span></span></span></div>`).join('')}</div>`:'<div class="muted small">אין התראות. הכל מסודר.</div>'}</div>`;
+}
+function maybeNotify(){try{if(!('Notification' in window)||Notification.permission!=='granted'||!ALERTS.length)return;const t=todayISO();if(localStorage.getItem('zm-notified')===t)return;localStorage.setItem('zm-notified',t);const n=new Notification(`ZVI MYKOFF · ${ALERTS.length} התראות`,{body:ALERTS.slice(0,4).map(a=>a.txt).join('\n'),lang:'he',dir:'rtl'});n.onclick=()=>{window.focus();location.hash='home'}}catch(e){}}
+
+/* ---------- reports ---------- */
+const MONTHS=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+function repData(y){
+  const m=Array.from({length:12},()=>({sales:0,cost:0})),byT={},byS={};
+  vals('dockets').forEach(d=>(d.services||[]).forEach(s=>{if(s.status==='cancelled')return;const mo=s.start||d.openDate||'';if(!mo.startsWith(String(y)))return;
+    const c=svcCalc(s),cu=s.currency||d.currency,sale=conv(c.sell,cu,'NIS',d.rates),cost=conv(c.net,cu,'NIS',d.rates),i=+mo.slice(5,7)-1;
+    m[i].sales+=sale;m[i].cost+=cost;
+    (byT[s.type]=byT[s.type]||{sales:0,cost:0,n:0});byT[s.type].sales+=sale;byT[s.type].cost+=cost;byT[s.type].n++;
+    const sn=supName(s.supplierId);(byS[sn]=byS[sn]||{sales:0,cost:0,n:0});byS[sn].sales+=sale;byS[sn].cost+=cost;byS[sn].n++}));
+  return {m,byT,byS};
+}
+function vReports(){
+  const y=ui.repYear||+todayISO().slice(0,4),{m,byT,byS}=repData(y);
+  const tot=m.reduce((a,x)=>({sales:a.sales+x.sales,cost:a.cost+x.cost}),{sales:0,cost:0});
+  const max=Math.max(1,...m.map(x=>x.sales)),W=740,top=26,ch=160;
+  const bars=m.map((x,i)=>{const cx=W-30-i*60,hs=x.sales/max*ch,hp=Math.max(0,x.sales-x.cost)/max*ch;return `<rect x="${cx-18}" y="${top+ch-hs}" width="36" height="${hs}" rx="5" fill="var(--accent-soft)" stroke="color-mix(in srgb,var(--accent) 30%,transparent)"/><rect x="${cx-11}" y="${top+ch-hp}" width="22" height="${hp}" rx="4" fill="var(--accent)"/>${x.sales?`<text x="${cx}" y="${top+ch-hs-7}" text-anchor="middle" class="lbl">${Math.round(x.sales).toLocaleString('he-IL')}</text>`:''}<text x="${cx}" y="${top+ch+18}" text-anchor="middle">${MONTHS[i].slice(0,3)}</text>`}).join('');
+  const row=(l,x)=>`<td class="num">${n2(x.sales)}</td><td class="num">${n2(x.cost)}</td><td class="num"><b>${n2(x.sales-x.cost)}</b></td><td class="num">${x.sales?Math.round((x.sales-x.cost)/x.sales*100)+'%':'—'}</td>`;
+  return `<div class="top"><h1>דוחות</h1><div class="row"><button class="btn sm" data-act="repYear" data-d="-1">›</button><b class="num" style="font-size:18px">${y}</b><button class="btn sm" data-act="repYear" data-d="1">‹</button></div></div>
+  <div class="tiles"><div class="tile" style="--c:#1f63a8">${uiIc('chart','#1f63a8')}<div class="k">מכירות ${y} (₪)</div><div class="v num">${n2(tot.sales)}</div></div><div class="tile" style="--c:#6a3fb5">${uiIc('sup','#6a3fb5')}<div class="k">עלות ספקים (₪)</div><div class="v num">${n2(tot.cost)}</div></div><div class="tile" style="--c:var(--ok)">${uiIc('owe','var(--ok)')}<div class="k">רווח (₪)</div><div class="v num">${n2(tot.sales-tot.cost)}</div><div class="k">${tot.sales?Math.round((tot.sales-tot.cost)/tot.sales*100)+'% מהמכירות':''}</div></div></div>
+  <div class="card" style="margin-bottom:12px"><h2><span>מכירות ורווח לפי חודש (₪)</span><span class="legend"><span><i style="background:var(--accent-soft);border:1px solid var(--accent)"></i>מכירות</span><span><i style="background:var(--accent)"></i>רווח</span></span></h2>
+    <svg class="chart" viewBox="0 0 ${W} 220" role="img" aria-label="גרף מכירות ורווח לפי חודש"><line x1="0" x2="${W}" y1="${top+ch}" y2="${top+ch}" stroke="var(--line)"/>${bars}</svg></div>
+  <div class="card" style="margin-bottom:12px"><h2><span>לפי חודש</span><span class="row"><button class="btn sm" data-act="repCsv" data-k="m">הורדה לאקסל</button><button class="btn sm" data-act="repCsv" data-k="d">כל הדוקטים לאקסל</button></span></h2><div class="scrollx"><table><thead><tr><th>חודש</th><th>מכירות</th><th>עלות</th><th>רווח</th><th>אחוז רווח</th></tr></thead><tbody>${m.map((x,i)=>`<tr><td>${MONTHS[i]}</td>${row('',x)}</tr>`).join('')}</tbody><tfoot><tr><th>סה״כ</th>${row('',tot).replace(/<td/g,'<th').replace(/<\/td>/g,'</th>')}</tr></tfoot></table></div></div>
+  <div class="grid2">
+    <div class="card"><h2><span>לפי סוג שירות</span><button class="btn sm" data-act="repCsv" data-k="t">הורדה לאקסל</button></h2>${Object.keys(byT).length?`<div class="scrollx"><table><thead><tr><th>שירות</th><th>כמות</th><th>מכירות</th><th>רווח</th></tr></thead><tbody>${Object.entries(byT).sort((a,b)=>b[1].sales-a[1].sales).map(([t,x])=>`<tr><td><span class="svc-type">${svcIc(t,'xs')}${SVC_T[t]}</span></td><td class="num">${x.n}</td><td class="num">${n2(x.sales)}</td><td class="num">${n2(x.sales-x.cost)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="muted small">אין נתונים לשנה הזו</div>'}</div>
+    <div class="card"><h2><span>לפי ספק</span><button class="btn sm" data-act="repCsv" data-k="s">הורדה לאקסל</button></h2>${Object.keys(byS).length?`<div class="scrollx"><table><thead><tr><th>ספק</th><th>כמות</th><th>עלות</th><th>רווח</th></tr></thead><tbody>${Object.entries(byS).sort((a,b)=>b[1].cost-a[1].cost).map(([s,x])=>`<tr><td>${esc(s)}</td><td class="num">${x.n}</td><td class="num">${n2(x.cost)}</td><td class="num">${n2(x.sales-x.cost)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="muted small">אין נתונים לשנה הזו</div>'}</div>
+  </div><p class="small muted">הדוח לפי תאריך השירות. סכומים מומרים לשקלים לפי השער של כל דוקט.</p>`;
+}
+function csvDownload(name,rows){const csv='﻿'+rows.map(r=>r.map(v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+function repCsv(k){
+  const y=ui.repYear||+todayISO().slice(0,4),{m,byT,byS}=repData(y),r2=v=>Math.round(v*100)/100;
+  if(k==='m')csvDownload(`דוח-חודשי-${y}.csv`,[['חודש','מכירות (₪)','עלות (₪)','רווח (₪)'],...m.map((x,i)=>[MONTHS[i],r2(x.sales),r2(x.cost),r2(x.sales-x.cost)])]);
+  if(k==='t')csvDownload(`דוח-לפי-שירות-${y}.csv`,[['סוג שירות','כמות','מכירות (₪)','רווח (₪)'],...Object.entries(byT).map(([t,x])=>[SVC_T[t],x.n,r2(x.sales),r2(x.sales-x.cost)])]);
+  if(k==='s')csvDownload(`דוח-לפי-ספק-${y}.csv`,[['ספק','כמות','עלות (₪)','מכירות (₪)','רווח (₪)'],...Object.entries(byS).map(([s,x])=>[s,x.n,r2(x.cost),r2(x.sales),r2(x.sales-x.cost)])]);
+  if(k==='d')csvDownload(`דוקטים-${y}.csv`,[['דוקט','כותרת','יציאה','חזרה','נוסעים','מטבע','מכירות','עלות','רווח','שולם','יתרה'],...vals('dockets').filter(d=>(dRange(d).start||d.openDate||'').startsWith(String(y))).sort((a,b)=>a.number-b.number).map(d=>{const k=dCalc(d),r=dRange(d);return [d.number,d.title,r.start,r.end,(d.passengers||[]).length,k.cur,r2(k.sales),r2(k.cost),r2(k.profit),r2(k.rec),r2(k.bal)]})]);
+}
+
+/* ---------- backup ---------- */
+const backupJSON=()=>JSON.stringify({app:'zm-crm',v:3,at:new Date().toISOString(),meta:S.meta,...Object.fromEntries(KINDS.filter(k=>k!=='files').map(k=>[k,vals(k)]))});
+function downloadBackup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([backupJSON()],{type:'application/json'}));a.download='zvi-mykoff-backup-'+todayISO()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);saveMeta({...S.meta,lastBackup:Date.now()});renderAll()}
+async function driveBackup(){
+  if(!window.firebase||!firebase.auth().currentUser)return toast('צריך להיות מחובר עם Google');
+  try{
+    let tok=null;try{const t=JSON.parse(sessionStorage.getItem('zm-gtok')||'null');if(t&&t.exp>Date.now())tok=t.tok}catch(e){}
+    if(!tok){const pv=new firebase.auth.GoogleAuthProvider();pv.addScope('https://www.googleapis.com/auth/drive.file');const r=await firebase.auth().currentUser.reauthenticateWithPopup(pv);tok=r.credential&&r.credential.accessToken;if(!tok)throw new Error('אין הרשאה');try{sessionStorage.setItem('zm-gtok',JSON.stringify({tok,exp:Date.now()+50*60e3}))}catch(e){}}
+    toast('שומר גיבוי בגוגל דרייב…');
+    const H={Authorization:'Bearer '+tok};
+    let folder=S.meta.driveFolder;
+    if(!folder){const fr=await fetch('https://www.googleapis.com/drive/v3/files?fields=id',{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({name:'ZVI MYKOFF גיבויים',mimeType:'application/vnd.google-apps.folder'})});if(fr.ok){folder=(await fr.json()).id}}
+    const up=async par=>{const fd=new FormData();fd.append('metadata',new Blob([JSON.stringify({name:`גיבוי-ZVI-MYKOFF-${todayISO()}.json`,mimeType:'application/json',...(par?{parents:[par]}:{})})],{type:'application/json'}));fd.append('file',new Blob([backupJSON()],{type:'application/json'}));return fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:H,body:fd})};
+    let res=await up(folder);if(!res.ok&&folder){folder='';res=await up('')}
+    if(!res.ok){if(res.status===401)sessionStorage.removeItem('zm-gtok');throw new Error('Drive '+res.status)}
+    await saveMeta({...S.meta,lastBackup:Date.now(),driveFolder:folder||''});renderAll();toast('הגיבוי נשמר בגוגל דרייב, בתיקייה "ZVI MYKOFF גיבויים"');
+  }catch(e){if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')return;toast('הגיבוי לדרייב נכשל ('+(e.code||e.message)+'). אפשר להוריד קובץ גיבוי במקום.')}
+}
+
 /* ---------- views ---------- */
 function route(){const h=location.hash.slice(1);if(h.startsWith('d-'))return ['docket',h.slice(2)];return [NAV.some(n=>n[0]===h)?h:'home']}
 function renderAll(){
   const [v,arg]=route();
+  ALERTS=loadState==='loading'?[]:alerts();
   $('#helloName').textContent='שלום'+(USER_NAME?', '+USER_NAME:'');$('#helloDate').textContent=new Date().toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  $('#nav').innerHTML=`<button class="new" data-act="newDocket"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>דוקט חדש</button>`+NAV.map(([k,t,p])=>`<a href="#${k}" class="${k===v||(v==='docket'&&k==='dockets')?'on':''}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="${p}"/></svg>${t}</a>`).join('');
+  $('#nav').innerHTML=`<button class="new" data-act="newDocket"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>דוקט חדש</button>`+NAV.map(([k,t,p])=>`<a href="#${k}" class="${k===v||(v==='docket'&&k==='dockets')?'on':''}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="${p}"/></svg>${t}${k==='home'&&ALERTS.length?`<span class="badge">${ALERTS.length}</span>`:''}</a>`).join('');
   const msg={stale:'לא ניתן להגיע לנתונים כרגע. מה שמוצג עשוי להיות לא מעודכן.',unreachable:'לא ניתן להגיע לנתונים כרגע. בדוק את החיבור לאינטרנט.',error:'החיבור לנתונים נקטע. רענן את הדף.',local:'מצב ניסיון: הנתונים נשמרים רק בדפדפן הזה.'}[loadState];
-  $('#banner').innerHTML=msg?`<div class="banner">${msg}</div>`:'';
-  $('#view').innerHTML=loadState==='loading'?'<div class="empty">טוען נתונים…</div>':(v==='docket'?vDocket(arg):({home:vHome,dockets:vDockets,customers:vCustomers,suppliers:vSuppliers,accounts:vAccounts,leads:vLeads,debts:vDebts,backup:vBackup}[v])());
+  const needBackup=loadState==='ready'&&vals('dockets').length&&(!S.meta.lastBackup||Date.now()-S.meta.lastBackup>7*864e5);
+  $('#banner').innerHTML=(msg?`<div class="banner">${msg}</div>`:'')+(needBackup?`<div class="banner" style="background:var(--accent-soft);color:var(--accent);display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="flex:1">${S.meta.lastBackup?'עברו יותר מ-7 ימים מהגיבוי האחרון.':'עוד לא נעשה גיבוי.'} כדאי לגבות פעם בשבוע.</span><button class="btn sm pri" data-act="driveBackup">גיבוי לגוגל דרייב</button><button class="btn sm" data-act="exportData">הורדת קובץ</button></div>`:'');
+  $('#view').innerHTML=loadState==='loading'?'<div class="empty">טוען נתונים…</div>':(v==='docket'?vDocket(arg):({home:vHome,dockets:vDockets,customers:vCustomers,suppliers:vSuppliers,accounts:vAccounts,reports:vReports,leads:vLeads,debts:vDebts,backup:vBackup}[v])());
   renderWidgets();
+  if(loadState==='ready')maybeNotify();
 }
 function vHome(){
   const t=todayISO(),ds=vals('dockets');
   if(!ds.length&&!vals('customers').length)return `<div class="card empty"><svg class="hero-ill" width="220" height="110" viewBox="0 0 220 110" aria-hidden="true"><path d="M20 95 Q110 -10 200 40" fill="none" stroke="var(--accent)" stroke-opacity=".45" stroke-width="2" stroke-dasharray="6 7"/><circle cx="110" cy="62" r="30" fill="none" stroke="var(--accent)" stroke-width="2.5"/><ellipse cx="110" cy="62" rx="13" ry="30" fill="none" stroke="var(--accent)" stroke-width="2"/><path d="M82 52h56M82 72h56M80 62h60" stroke="var(--gold)" stroke-width="2"/><g transform="translate(186 26) rotate(28) scale(1.1)" fill="var(--accent)"><path d="M11 8v-1l-4-2.5V1.8a.8.8 0 0 0-1.5 0v2.7L1.5 7v1l4-1.3v2.8l-1 .8v.8l1.8-.5 1.7.5v-.8l-1-.8V6.7z"/></g></svg><h2>ברוך הבא למערכת</h2><p>מתחילים בפתיחת דוקט חדש. כל מה שמכניסים נשמר אוטומטית.</p><div class="row" style="justify-content:center"><button class="btn pri" data-act="newDocket">+ דוקט ראשון</button><button class="btn" data-act="loadDemo">טעינת נתוני דוגמה לניסיון</button></div></div>`;
   const open=ds.filter(d=>d.status!=='closed');
   let owe=0,sup=0,salesM=0,profitM=0;const ym=t.slice(0,7);
-  ds.forEach(d=>{const k=dCalc(d);owe+=Math.max(0,conv(k.bal,k.cur,'NIS'));sup+=Math.max(0,conv(k.supBal,k.cur,'NIS'));if((d.openDate||'').startsWith(ym)){salesM+=conv(k.sales,k.cur,'NIS');profitM+=conv(k.profit,k.cur,'NIS')}});
+  ds.forEach(d=>{const k=dCalc(d),R=d.rates;owe+=Math.max(0,conv(k.bal,k.cur,'NIS',R));sup+=Math.max(0,conv(k.supBal,k.cur,'NIS',R));if((d.openDate||'').startsWith(ym)){salesM+=conv(k.sales,k.cur,'NIS',R);profitM+=conv(k.profit,k.cur,'NIS',R)}});
   const upcoming=open.map(d=>({d,r:dRange(d)})).filter(x=>x.r.start&&x.r.start>=t&&x.r.start<=addDays(t,30)).sort((a,b)=>a.r.start.localeCompare(b.r.start));
   const pass=[];open.forEach(d=>{const r=dRange(d);if(!r.end||r.end<t)return;(d.passengers||[]).forEach(p=>{const c=S.customers[p];if(c&&(!c.passportExp||c.passportExp<addMonths(r.end,6)))pass.push({d,c,r})})});
-  return `<div class="tiles">
+  return `${alertsCard()}<div class="tiles">
     <div class="tile" style="--c:#1f63a8">${uiIc('dk','#1f63a8')}<div class="k">דוקטים פתוחים</div><div class="v num">${open.length}</div></div>
     <div class="tile" style="--c:${owe>1?'var(--bad)':'var(--ok)'}">${uiIc('owe',owe>1?'var(--bad)':'var(--ok)')}<div class="k">לקוחות חייבים (₪)</div><div class="v num">${n2(owe)}</div></div>
     <div class="tile" style="--c:#6a3fb5">${uiIc('sup','#6a3fb5')}<div class="k">לשלם לספקים (₪)</div><div class="v num">${n2(sup)}</div></div>
@@ -843,13 +1152,13 @@ function vSuppliers(){
 }
 function vAccounts(){
   const ds=vals('dockets');let sales=0,cost=0,rec=0,pmt=0;const owe=[];
-  ds.forEach(d=>{const k=dCalc(d);sales+=conv(k.sales,k.cur,'NIS');cost+=conv(k.cost,k.cur,'NIS');rec+=conv(k.rec,k.cur,'NIS');if(k.bal>0.5)owe.push({d,k})});
-  vals('payments').filter(p=>p.kind==='PMT').forEach(p=>pmt+=conv(p.amount,p.currency,'NIS'));
+  ds.forEach(d=>{const k=dCalc(d),R=d.rates;sales+=conv(k.sales,k.cur,'NIS',R);cost+=conv(k.cost,k.cur,'NIS',R);rec+=conv(k.rec,k.cur,'NIS',R);if(k.bal>0.5)owe.push({d,k})});
+  vals('payments').filter(p=>p.kind==='PMT').forEach(p=>pmt+=conv(p.amount,p.currency,'NIS',S.dockets[p.docketId]?.rates));
   const docs=vals('payments').sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.number-a.number)).slice(0,40);
   const sups=vals('suppliers').map(s=>({s,b:supplierBalance(s.id)})).filter(x=>x.b.bal>0.5).sort((a,b)=>b.b.bal-a.b.bal);
   return `<h1 style="margin-bottom:12px">כספים והנהלת חשבונות</h1>
   <div class="tiles"><div class="tile"><div class="k">סך מכירות (₪)</div><div class="v num">${n2(sales)}</div></div><div class="tile"><div class="k">עלות ספקים (₪)</div><div class="v num">${n2(cost)}</div></div><div class="tile"><div class="k">רווח (₪)</div><div class="v num">${n2(sales-cost)}</div></div><div class="tile"><div class="k">התקבל מלקוחות (₪)</div><div class="v num">${n2(rec)}</div></div><div class="tile"><div class="k">שולם לספקים (₪)</div><div class="v num">${n2(pmt)}</div></div></div>
-  <p class="small muted">סכומים במטבע זר מומרים לשקלים לפי ${autoOn()?'השער היציג של בנק ישראל':'השער הידני במסך ההגדרות'}.</p>
+  <p class="small muted">סכומים במטבע זר מומרים לשקלים לפי השער הקבוע של כל דוקט.</p>
   <div class="grid2">
     <div class="card"><h2>לקוחות עם יתרה</h2>${owe.length?`<div class="list">${owe.map(({d,k})=>`<div class="li" data-act="goDocket" data-id="${d.id}"><span><b class="num">#${d.number}</b> ${esc(d.title)}<span class="sub">תאריך תשלום ${fmtDate(d.paymentDue)}</span></span><span class="pill bad">${amt(k.bal,k.cur)}</span></div>`).join('')}</div>`:'<div class="muted small">אין יתרות פתוחות</div>'}</div>
     <div class="card"><h2>יתרות לספקים</h2>${sups.length?`<div class="list">${sups.map(({s,b})=>`<div class="li" data-act="openSupplier" data-id="${s.id}"><span>${esc(s.name)}</span><span class="pill bad num">${n2(b.bal)} ₪</span></div>`).join('')}</div>`:'<div class="muted small">הכל שולם לספקים</div>'}</div>
@@ -873,13 +1182,18 @@ function vBackup(){
   <div class="card"><h2>פרטי העסק ושערים</h2><form class="form" id="bizF" onsubmit="return false">
     <label class="full" for="bizName">שם העסק<input id="bizName" value="${esc(m.bizName||'ZVI MYKOFF')}"></label>
     <label for="bizId">מספר עוסק<input id="bizId" value="${esc(m.bizId||'')}" dir="ltr"></label><label for="bizPhone">טלפון<input id="bizPhone" value="${esc(m.bizPhone||'')}" dir="ltr"></label>
-    <label class="full" for="rMode">שערי מטבע<select id="rMode"><option value="auto" ${m.rateMode!=='manual'?'selected':''}>שער יציג של בנק ישראל (מתעדכן לבד)</option><option value="manual" ${m.rateMode==='manual'?'selected':''}>שער ידני</option></select></label>
-    <div class="full small muted">${AUTO?`שער יציג אחרון: דולר <b class="num">${AUTO.USD}</b> · יורו <b class="num">${AUTO.EUR}</b> · מתאריך ${fmtDate(AUTO.date)}`:'השער היציג עוד לא נטען. עד אז משתמשים בשער הידני.'}</div>
+    <label class="full" for="rMode">שערי מטבע לדוקטים חדשים<select id="rMode"><option value="auto" ${m.rateMode!=='manual'?'selected':''}>שער יציג של בנק ישראל (מתעדכן לבד)</option><option value="manual" ${m.rateMode==='manual'?'selected':''}>שער ידני</option></select></label>
+    <div class="full small muted">${AUTO?`שער יציג אחרון: דולר <b class="num">${AUTO.USD}</b> · יורו <b class="num">${AUTO.EUR}</b> · מתאריך ${fmtDate(AUTO.date)}`:'השער היציג עוד לא נטען. עד אז משתמשים בשער הידני.'} כל דוקט שומר את השער מיום הפתיחה.</div>
     <label for="rUSD">שער דולר ידני (₪)<input id="rUSD" type="number" step="any" value="${esc(r.USD||DEF_RATES.USD)}"></label><label for="rEUR">שער יורו ידני (₪)<input id="rEUR" type="number" step="any" value="${esc(r.EUR||DEF_RATES.EUR)}"></label>
   </form><div class="actions"><button class="btn pri" data-act="saveBiz">שמירה</button></div><p class="muted small">הקבלות כאן הן לתיעוד פנימי. קבלה רשמית לרשות המסים צריכה להיות מתוכנה מאושרת.</p></div>
-  <div class="card"><h2>גיבוי</h2><p class="small muted">הנתונים נשמרים אוטומטית בענן של Google. אפשר גם להוריד עותק גיבוי ולשחזר ממנו.</p><div class="row"><button class="btn" data-act="exportData">הורדת גיבוי</button><label class="btn" for="imp">שחזור מקובץ גיבוי</label><input type="file" id="imp" accept=".json,.txt,application/json" hidden></div>
-  <p class="small muted" style="margin-top:12px">דוקטים ${vals('dockets').length} · לקוחות ${vals('customers').length} · ספקים ${vals('suppliers').length} · מסמכים ${vals('payments').length}</p>
-  <div class="row"><button class="btn" data-act="loadDemo">טעינת נתוני דוגמה</button></div></div></div>`;
+  <div class="card"><h2>גיבוי</h2><p class="small muted">הנתונים נשמרים אוטומטית בענן של Google. בנוסף כדאי לשמור עותק פעם בשבוע, ותופיע תזכורת.</p>
+    <div class="row"><button class="btn pri" data-act="driveBackup">גיבוי לגוגל דרייב</button><button class="btn" data-act="exportData">הורדת קובץ גיבוי</button><label class="btn" for="imp">שחזור מקובץ גיבוי</label><input type="file" id="imp" accept=".json,.txt,application/json" hidden></div>
+    <p class="small muted" style="margin-top:10px">גיבוי אחרון: <b>${m.lastBackup?new Date(m.lastBackup).toLocaleString('he-IL'):'עוד לא בוצע'}</b>. הגיבוי לדרייב נשמר בתיקייה "ZVI MYKOFF גיבויים". קבצים מצורפים נשמרים בענן ולא נכללים בקובץ הגיבוי.</p>
+    <p class="small muted">דוקטים ${vals('dockets').length} · לקוחות ${vals('customers').length} · ספקים ${vals('suppliers').length} · מסמכים ${vals('payments').length} · קבצים ${vals('files').length}</p>
+    <div class="row"><button class="btn" data-act="loadDemo">טעינת נתוני דוגמה</button></div></div></div>
+  <div class="card tpl" style="margin-top:12px"><h2>תבניות הודעות ללקוחות</h2><p class="small muted">אפשר לכתוב בתבנית: <span class="ltr">{שם} {דוקט} {יתרה} {תאריך} {טיסות} {PNR} {מסלול} {עסק}</span>, והם יוחלפו בפרטים של הדוקט.</p>
+    <div class="grid2">${DEF_TPL.map(([k,l])=>`<label class="form" style="display:block" for="tpl_${k}"><span class="small" style="font-weight:700;display:block;margin-bottom:4px">${l}</span><textarea id="tpl_${k}">${esc(tplText(k))}</textarea></label>`).join('')}</div>
+    <div class="actions"><button class="btn pri" data-act="saveTpl">שמירת התבניות</button><button class="btn" data-act="resetTpl">החזרה לנוסח המקורי</button></div></div>`;
 }
 
 /* ---------- widgets ---------- */
@@ -931,7 +1245,12 @@ document.addEventListener('click',e=>{if(!e.target.closest('.search'))$('#result
 const A={
   closeModal,signIn:()=>signIn(),signOut:()=>firebase.auth().signOut(),print:()=>window.print(),
   newDocket:d=>newDocketForm(d.cust),goDocket:d=>{closeModal();location.hash='d-'+d.id},editDocket:d=>editDocketForm(d.id),
-  svcForm:d=>svcForm(d.id,d.s,d.t),recForm:d=>recForm(d.id),pmtForm:d=>pmtForm(d.id,d.sup),openPay:d=>openPay(d.id),itinerary:d=>itinerary(d.id),
+  svcForm:d=>svcForm(d.id,d.s,d.t),recForm:d=>recForm(d.id),pmtForm:d=>pmtForm(d.id,d.sup),openPay:d=>openPay(d.id),itinerary:d=>messageForm(d.id,'itinerary'),msgForm:d=>messageForm(d.id,d.k),dupDocket:d=>dupDocketForm(d.id),
+  openFile:d=>openFile(d.id),delFile:async d=>{const m=S.files[d.id];if(await confirmBox('למחוק את הקובץ '+(m?.name||'')+'?','מחיקה')){await delFileRec(d.id);if(m?.supplierId)openSupplier(m.supplierId)}},
+  enableNotif:()=>{Notification.requestPermission().then(()=>{renderAll();maybeNotify()})},
+  repYear:d=>{ui.repYear=(ui.repYear||+todayISO().slice(0,4))+(+d.d);renderAll()},repCsv:d=>repCsv(d.k),driveBackup:()=>driveBackup(),
+  saveTpl:()=>{const t={};DEF_TPL.forEach(([k])=>{t[k]=$('#tpl_'+k).value});saveMeta({...S.meta,templates:t});toast('התבניות נשמרו')},
+  resetTpl:async()=>{if(await confirmBox('להחזיר את כל התבניות לנוסח המקורי?','החזרה')){await saveMeta({...S.meta,templates:{}});renderAll()}},
   addPax:d=>{const dk=S.dockets[d.id];pickCustomer('הוספת נוסע לדוקט #'+dk.number,async cid=>{const nd=clone(S.dockets[d.id]);nd.passengers=[...new Set([...(nd.passengers||[]),cid])];(nd.services||[]).forEach(s=>{if(s.status!=='cancelled')s.paxIds=[...new Set([...(s.paxIds||[]),cid])]});await saveRec('dockets',nd);toast('הנוסע נוסף')},dk.passengers||[])},
   removePax:async d=>{if(!(await confirmBox('להסיר את הנוסע מהדוקט? הלקוח עצמו לא יימחק.','הסרה')))return;const nd=clone(S.dockets[d.id]);nd.passengers=(nd.passengers||[]).filter(x=>x!==d.c);(nd.services||[]).forEach(s=>s.paxIds=(s.paxIds||[]).filter(x=>x!==d.c));saveRec('dockets',nd)},
   toggleClose:d=>{const nd=clone(S.dockets[d.id]);nd.status=nd.status==='closed'?'open':'closed';saveRec('dockets',nd);toast(nd.status==='closed'?'הדוקט נסגר':'הדוקט נפתח מחדש')},
@@ -951,12 +1270,21 @@ const A={
   calPick:d=>{ui.flightDate=d.d;renderWidgets()},
   copy:async d=>{const el=$('#'+d.src);try{await navigator.clipboard.writeText(el.value);toast('הועתק')}catch(e){el.hidden=false;el.select();toast('סמן והעתק ידנית')}},
   saveBiz:()=>{saveMeta({...S.meta,bizName:$('#bizName').value.trim(),bizId:$('#bizId').value.trim(),bizPhone:$('#bizPhone').value.trim(),rateMode:$('#rMode').value,rates:{USD:+$('#rUSD').value||DEF_RATES.USD,EUR:+$('#rEUR').value||DEF_RATES.EUR}});toast('נשמר');renderAll()},
-  exportData:()=>{const data=JSON.stringify({app:'zm-crm',v:2,at:new Date().toISOString(),meta:S.meta,...Object.fromEntries(KINDS.map(k=>[k,vals(k)]))});const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download='zvi-mykoff-backup-'+todayISO()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)},
+  exportData:()=>downloadBackup(),
   loadDemo:async()=>{if(!(await confirmBox('להוסיף נתוני דוגמה? אפשר למחוק אותם אחר כך.','הוספה')))return;await loadDemo();toast('נתוני הדוגמה נוספו')}
 };
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;if(el.closest('.segs'))return;e.preventDefault();$('#results').classList.remove('show');const f=A[el.dataset.act];if(f)f(el.dataset)});
 $('#modalBg').addEventListener('mousedown',e=>{if(e.target.id==='modalBg')closeModal()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+document.addEventListener('change',async e=>{
+  const el=e.target;if(!['dkScan','dkConf','dkFile','supFile','ndScan'].includes(el.id))return;
+  const files=el.files?[...el.files]:[],id=el.dataset.id;el.value='';if(!files.length)return;
+  if(el.id==='dkScan')scanPassportsInto(id,files);
+  else if(el.id==='dkConf')readConfirmation(id,files[0]);
+  else if(el.id==='dkFile')uploadFiles(files,{docketId:id});
+  else if(el.id==='supFile'){await uploadFiles(files,{supplierId:id});openSupplier(id)}
+  else if(el.id==='ndScan'){closeModal();createDocketFromPassports(files)}
+});
 document.addEventListener('change',async e=>{
   if(e.target.id!=='imp')return;const file=e.target.files[0];if(!file)return;
   try{const d=JSON.parse(await file.text());if(d.app!=='zm-crm')throw 0;const n=KINDS.reduce((a,k)=>a+(d[k]||[]).length,0);
@@ -974,13 +1302,13 @@ async function loadDemo(){
   for(const [ti,l,f,he,idn,dob,pp,exp] of cs){const id=newId();C[l]=id;await saveRec('customers',{id,title:ti,lastName:l,firstName:f,nameHe:he,idNum:idn,dob,passportNo:pp,passportExp:exp,phone:'052-4418823',country:'Israel',citizenship:'Israeli',createdAt:Date.now()})}
   const go=addDays(t,10),back=addDays(t,15);
   const n1=await nextNo('docketNo',1006000);
-  const d1={id:newId(),number:n1,title:'MYKOFF/ZVI',dtype:'קבוצה',currency:'USD',customerId:C.MYKOFF,passengers:[C.MYKOFF,C.GALANDAWER,C.KARO],status:'open',openDate:t,paymentDue:addDays(t,-2),createdAt:Date.now(),services:[
+  const d1={id:newId(),number:n1,title:'MYKOFF/ZVI',dtype:'קבוצה',currency:'USD',customerId:C.MYKOFF,passengers:[C.MYKOFF,C.GALANDAWER,C.KARO],status:'open',openDate:t,paymentDue:addDays(t,-2),rates:todayRates(),createdAt:Date.now(),services:[
     {id:newId(),type:'flight',status:'ok',supplierId:P.derech,pnr:'7YCRYL',currency:'USD',base:339,tax:113.61,fee:0,commPct:3,sell:520,paxIds:[C.MYKOFF,C.GALANDAWER,C.KARO],segments:[{from:'TLV',to:'KRK',flight:'LY5119',date:go,dep:'06:00',arr:'08:55'},{from:'KRK',to:'TLV',flight:'LY5120',date:back,dep:'10:10',arr:'14:45'}],start:go,end:back,desc:'TLV→KRK · KRK→TLV'},
     {id:newId(),type:'hotel',status:'ok',supplierId:P.hilton,ref:'HB-55120',currency:'EUR',base:780,tax:0,fee:0,commPct:10,sell:860,paxIds:[C.MYKOFF,C.GALANDAWER,C.KARO],start:go,end:back,desc:'Hilton Krakow · 5 לילות · 2 חדרים',dest:'Krakow'},
     {id:newId(),type:'insurance',status:'ok',supplierId:P.harel,currency:'NIS',base:270,tax:0,fee:0,commPct:15,sell:330,paxIds:[C.MYKOFF,C.GALANDAWER,C.KARO],start:go,end:back,desc:'ביטוח נסיעות'}]};
   await saveRec('dockets',d1);
   const n2_=await nextNo('docketNo',1006000);
-  const d2={id:newId(),number:n2_,title:'KARO/YOSEF',dtype:'רגיל',currency:'USD',customerId:C.KARO,passengers:[C.KARO],status:'open',openDate:t,paymentDue:addDays(t,20),createdAt:Date.now(),services:[
+  const d2={id:newId(),number:n2_,title:'KARO/YOSEF',dtype:'רגיל',currency:'USD',customerId:C.KARO,passengers:[C.KARO],status:'open',openDate:t,paymentDue:addDays(t,20),rates:todayRates(),createdAt:Date.now(),services:[
     {id:newId(),type:'flight',status:'ok',supplierId:P.elal,pnr:'8RVGVQ',currency:'USD',base:250,tax:42.8,fee:0,commPct:0,sell:320,paxIds:[C.KARO],segments:[{from:'TLV',to:'RMO',flight:'LY2581',date:addDays(t,25),dep:'15:55',arr:'18:20'}],start:addDays(t,25),end:addDays(t,25),desc:'TLV→RMO'}]};
   await saveRec('dockets',d2);
   const r=await nextNo('recNo',2011000);await saveRec('payments',{id:newId(),kind:'REC',docketId:d1.id,payerId:C.MYKOFF,amount:900,currency:'USD',date:t,method:'העברה בנקאית',number:r,createdAt:Date.now()});
