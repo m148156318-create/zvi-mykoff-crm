@@ -262,6 +262,8 @@ body{background:radial-gradient(1200px 500px at 85% -10%,color-mix(in srgb,var(-
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:5px;vertical-align:middle}
 .tpl textarea{width:100%;min-height:110px}
 .pp td input{width:100%;min-width:70px}
+.lockbar{display:flex;gap:10px;align-items:center;background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:10px 14px;font-weight:600}
+.lockbar svg{flex:none}
 .form label[hidden]{display:none}
 .dk-main .grid2{grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
 .fileic{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;background:var(--accent-soft);color:var(--accent);font-size:9px;font-weight:700;margin-inline-end:8px;flex:none}
@@ -666,22 +668,22 @@ function vDocket(id){
     <div class="dk-f"><span>לקוח עסקי</span><b>${d.customerId?`<a href="#" data-act="openCustomer" data-id="${d.customerId}" style="color:#fff">${esc(custName(d.customerId))}</a>`:'—'}</b></div>
     <div class="dk-f"><span>תאריך תשלום</span><b>${fmtDate(d.paymentDue)}</b></div>
     <div class="dk-f"><span>נפתח</span><b>${fmtDate(d.openDate)}</b></div>
-    <div class="dk-f"><span>סטטוס</span><b>${closed?'סגור':'פתוח'}</b></div>
+    <div class="dk-f"><span>סטטוס</span><b>${closed?LOCKSVG+' נעול'+(d.lockedAt?' מ-'+fmtDate(new Date(d.lockedAt).toISOString().slice(0,10)):''):'פתוח'}</b></div>
     ${d.notes?`<div class="dk-f"><span>הערות</span><b>${esc(d.notes)}</b></div>`:''}
     <div class="dk-acts">
-      <button data-act="editDocket" data-id="${id}">עריכת פרטי הדוקט</button>
+      ${closed?'':`<button data-act="editDocket" data-id="${id}">עריכת פרטי הדוקט</button>
       <button data-act="addPax" data-id="${id}">+ הוספת נוסע</button>
       <label for="dkScan">+ סריקת דרכונים לנוסעים</label>
-      <label for="dkConf">+ העלאת אישור הזמנה (טיסה)</label>
+      <label for="dkConf">+ העלאת אישור הזמנה (טיסה)</label>`}
       <button data-act="recForm" data-id="${id}">+ תקבול מהלקוח</button>
       <button data-act="pmtForm" data-id="${id}">+ תשלום לספק</button>
       <button data-act="msgForm" data-id="${id}" data-k="itinerary">הודעה ללקוח בוואטסאפ</button>
       <button data-act="msgForm" data-id="${id}" data-k="balance">תזכורת תשלום</button>
       <label for="dkFile">+ צירוף קובץ</label>
       <button data-act="dupDocket" data-id="${id}">שכפול הדוקט</button>
-      <button data-act="toggleClose" data-id="${id}">${closed?'פתיחת הדוקט מחדש':'סגירת הדוקט'}</button>
+      <button data-act="toggleClose" data-id="${id}">${LOCKSVG} ${closed?'ביטול הנעילה':'נעילת הדוקט'}</button>
       <button data-act="newDocket">דוקט חדש</button>
-      <button class="warn" data-act="delDocket" data-id="${id}">מחיקת הדוקט</button>
+      ${closed?'':`<button class="warn" data-act="delDocket" data-id="${id}">מחיקת הדוקט</button>`}
     </div>
     <input type="file" id="dkScan" data-id="${id}" accept="image/*" multiple hidden>
     <input type="file" id="dkConf" data-id="${id}" accept="application/pdf,image/*" hidden>
@@ -689,13 +691,13 @@ function vDocket(id){
   </aside>
   <section class="dk-main">
     <div class="dk-bar"><div class="dates num">${r.start?`${fmtDate(r.start)} – ${fmtDate(r.end)} <span class="pill acc">${r.days} ימים</span>`:'<span class="muted">עוד אין תאריכים</span>'}</div><div class="small muted">מטבע הדוקט <b class="ltr">${cur}</b> · ${R?'שער קבוע לדוקט':(autoOn()?'שער יציג יומי':'שער ידני')}: <span class="num ltr">$ ${rate('USD',R)} · € ${rate('EUR',R)}</span></div></div>
-    <div class="card" style="padding:10px"><div class="small muted" style="margin-bottom:6px">הוספת שירות:</div><div class="svc-bar">${SVC.map(([t,l,c])=>`<button class="svc-btn" data-act="svcForm" data-id="${id}" data-t="${t}">${svcIc(t,'sm')}${l}</button>`).join('')}</div></div>
+    ${closed?`<div class="lockbar">${LOCKSVG.replace('14','20').replace('14','20')}<span>הדוקט נעול. אי אפשר לשנות שירותים, מחירים, נוסעים ופרטים, ואי אפשר לבטל מסמכים. עדיין אפשר לרשום תשלומים, לשלוח הודעות ולצרף קבצים.</span><button class="btn sm" data-act="toggleClose" data-id="${id}">ביטול הנעילה</button></div>`:`<div class="card" style="padding:10px"><div class="small muted" style="margin-bottom:6px">הוספת שירות:</div><div class="svc-bar">${SVC.map(([t,l,c])=>`<button class="svc-btn" data-act="svcForm" data-id="${id}" data-t="${t}">${svcIc(t,'sm')}${l}</button>`).join('')}</div></div>`}
     <div class="tbl"><table class="svct"><thead><tr><th>#</th><th>שירות</th><th>נוסעים</th><th>תאריך התחלה</th><th>תאריך סיום</th><th>תיאור</th><th>PNR</th><th>סכום</th><th>סכום (${cur})</th><th>ספק</th></tr></thead><tbody>
     ${svcs.length?svcs.map((s,i)=>{const c=svcCalc(s),st=SVC_ST[s.status]||SVC_ST.ok;return `<tr class="${s.status==='cancelled'?'cancelled':''}" data-act="svcForm" data-id="${id}" data-s="${s.id}"><td class="num">${i+1}</td><td><span class="svc-type">${svcIc(s.type,'sm')}${SVC_T[s.type]}</span> <span class="pill ${st[1]}">${st[0]}</span></td><td class="num">${(s.paxIds||[]).length||s.paxCount||''}${s.perPax?' <span class="pill acc" title="מחיר לפי נוסע">₪/נוסע</span>':''}</td><td class="num">${fmtDate(s.start)}</td><td class="num">${fmtDate(s.end)}</td><td class="desc" dir="auto">${esc(s.desc||'')}${s.type==='flight'&&s.segments?.length?`<span class="sub ltr">${s.segments.map(g=>`${esc(g.from||'')}→${esc(g.to||'')} ${esc(g.flight||'')}`).join(' · ')}</span>`:''}</td><td class="ltr">${esc(s.pnr||'')}</td><td>${amt(c.sell,s.currency||cur)}</td><td>${amt(conv(c.sell,s.currency||cur,cur,R),cur)}</td><td>${esc(supName(s.supplierId))}</td></tr>`}).join(''):`<tr><td colspan="10" class="empty">עוד אין שירותים. בוחרים סוג שירות למעלה, או מעלים אישור הזמנה.</td></tr>`}
     </tbody></table></div>
     <div class="grid2">
-      <div class="card"><div class="panel-h"><h2>נוסעים (${pax.length})</h2><span class="row"><label class="btn sm" for="dkScan">סריקת דרכונים</label><button class="btn sm" data-act="addPax" data-id="${id}">+ להוסיף</button></span></div>
-        ${pax.length?`<div class="scrollx"><table><thead><tr><th>כינוי</th><th>שם נוסע</th><th>ת. לידה</th><th>גיל</th><th>דרכון</th><th></th></tr></thead><tbody>${pax.map(c=>`<tr><td>${esc(c.title||'')}</td><td><a href="#" data-act="openCustomer" data-id="${c.id}">${esc(custLabel(c))}</a><span class="sub">${esc(c.nameHe||'')}</span></td><td class="num">${fmtDate(c.dob)}</td><td class="num">${ageAt(c.dob,r.start)}</td><td>${passPill(c,r.end)}</td><td><button class="btn sm danger" data-act="removePax" data-id="${id}" data-c="${c.id}" aria-label="הסרת נוסע">הסרה</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="muted small">אין נוסעים</div>'}
+      <div class="card"><div class="panel-h"><h2>נוסעים (${pax.length})</h2>${closed?'':`<span class="row"><label class="btn sm" for="dkScan">סריקת דרכונים</label><button class="btn sm" data-act="addPax" data-id="${id}">+ להוסיף</button></span>`}</div>
+        ${pax.length?`<div class="scrollx"><table><thead><tr><th>כינוי</th><th>שם נוסע</th><th>ת. לידה</th><th>גיל</th><th>דרכון</th><th></th></tr></thead><tbody>${pax.map(c=>`<tr><td>${esc(c.title||'')}</td><td><a href="#" data-act="openCustomer" data-id="${c.id}">${esc(custLabel(c))}</a><span class="sub">${esc(c.nameHe||'')}</span></td><td class="num">${fmtDate(c.dob)}</td><td class="num">${ageAt(c.dob,r.start)}</td><td>${passPill(c,r.end)}</td><td>${closed?'':`<button class="btn sm danger" data-act="removePax" data-id="${id}" data-c="${c.id}" aria-label="הסרת נוסע">הסרה</button>`}</td></tr>`).join('')}</tbody></table></div>`:'<div class="muted small">אין נוסעים</div>'}
       </div>
       <div class="card"><div class="panel-h"><h2>התחשבנות</h2><span class="row"><button class="btn sm" data-act="recForm" data-id="${id}">+ תקבול</button><button class="btn sm" data-act="pmtForm" data-id="${id}">+ תשלום לספק</button></span></div>
         ${pays.length?`<div class="scrollx"><table><thead><tr><th>סוג</th><th>מסמך</th><th>תאריך</th><th>סכום</th><th>(${cur})</th><th>מאת / אל</th></tr></thead><tbody>${pays.map(p=>`<tr data-act="openPay" data-id="${p.id}" style="cursor:pointer"><td><span class="pill ${p.kind==='REC'?'ok':'pmt'}">${p.kind}</span></td><td class="num">${p.number}</td><td class="num">${fmtDate(p.date)}</td><td>${amt(p.amount,p.currency)}</td><td>${amt(conv(p.amount,p.currency,cur,R),cur)}</td><td>${esc(p.kind==='REC'?custName(p.payerId):supName(p.supplierId))}</td></tr>`).join('')}</tbody></table></div>`:'<div class="muted small">אין מסמכים</div>'}
@@ -726,6 +728,7 @@ const F_SVC_P=[
 function paxType(c,at){const a=ageAt(c?.dob,at);if(a===''||a==null)return 'ADT';return a<2?'INF':a<12?'CHD':'ADT'}
 function svcForm(did,sid,type,pre){
   const d=S.dockets[did];if(!d)return;
+  const locked=d.status==='closed';if(locked&&!sid)return lockGuard(did);
   const s=sid?clone((d.services||[]).find(x=>x.id===sid)):{id:newId(),type:type||'flight',status:'ok',currency:d.currency||'USD',paxIds:[...(d.passengers||[])],segments:[],...(pre||{})};
   const note=s._note;delete s._note;
   if(s.type==='flight'&&!(s.segments||[]).length)s.segments=[{}];
@@ -758,6 +761,7 @@ function svcForm(did,sid,type,pre){
   const cur=()=>{readPP();const o=readFields(F_SVC_P,$('#frm'))||{};return {...o,perPax:$('#perPax').checked,paxPrices:pp,paxIds:selPax()}};
   const calc=()=>{const o=cur(),c=svcCalc(o),cu=o.currency||'';$('#calc').innerHTML=`<div><span>עלות כוללת</span><b>${amt(c.total,cu)}</b></div><div><span>עמלה</span><b>${amt(c.comm,cu)}</b></div><div><span>נטו לתשלום לספק</span><b>${amt(c.net,cu)}</b></div><div><span>מחיר מכירה</span><b>${amt(c.sell,cu)}</b></div><div class="hl"><span>רווח</span><b>${amt(c.profit,cu)}</b></div>`};
   drawPP();calc();
+  if(locked){$('#frm').querySelectorAll('input,select,textarea,button').forEach(x=>x.disabled=true);['#frmSave','#svcDel','#segAdd'].forEach(s=>{const b=$(s);if(b)b.remove()});$('#modal h2').innerHTML=LOCKSVG+' צפייה בשירות · הדוקט נעול'}
   $('#frm').addEventListener('input',e=>{if(e.target.closest('#ppBox')||F_SVC_P.some(f=>f.k===e.target.name))calc()});
   $('#frm').addEventListener('change',e=>{if(e.target.name==='paxIds'||e.target.id==='perPax'){readPP();
     if(e.target.id==='perPax'&&e.target.checked){const ids=selPax(),empty=ids.every(id=>!pp[id]||['base','tax','fee','sell'].every(k=>pp[id][k]===''||pp[id][k]==null));
@@ -1102,6 +1106,9 @@ async function driveBackup(){
   }catch(e){if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')return;toast('הגיבוי לדרייב נכשל ('+(e.code||e.message)+'). אפשר להוריד קובץ גיבוי במקום.')}
 }
 
+const LOCKSVG='<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:-2px;fill:currentColor"><path d="M17 9V7A5 5 0 0 0 7 7v2a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zM9 7a3 3 0 0 1 6 0v2H9z"/></svg>';
+const isLocked=id=>S.dockets[id]?.status==='closed';
+const lockGuard=id=>{if(isLocked(id)){toast('הדוקט נעול. כדי לשנות, פותחים קודם את הנעילה');return true}return false};
 /* ---------- short address (Firebase Hosting redirect) ---------- */
 const SHORT_URL='https://zvi-mykoff-crm.web.app';
 async function setupShortLink(){
@@ -1157,8 +1164,8 @@ function vDockets(){
   if(f==='open')ds=ds.filter(d=>d.status!=='closed');if(f==='closed')ds=ds.filter(d=>d.status==='closed');if(f==='owe')ds=ds.filter(d=>dCalc(d).bal>0.5);
   ds.sort((a,b)=>(b.number||0)-(a.number||0));
   return `<div class="top"><h1>דוקטים</h1><button class="btn pri" data-act="newDocket">+ דוקט חדש</button></div>
-  <div class="chips">${[['open','פתוחים'],['owe','עם יתרת לקוח'],['closed','סגורים'],['all','הכל']].map(([k,t])=>`<button class="chip ${f===k?'on':''}" data-act="dkFilter" data-v="${k}">${t}</button>`).join('')}</div>
-  ${ds.length?`<div class="tbl"><table><thead><tr><th>דוקט</th><th>כותרת</th><th>תאריכים</th><th>נוסעים</th><th>שירותים</th><th>מכירות</th><th>רווח</th><th>יתרת לקוח</th><th>סטטוס</th></tr></thead><tbody>${ds.map(d=>{const k=dCalc(d),r=dRange(d);return `<tr data-act="goDocket" data-id="${d.id}"><td class="num"><b>${d.number}</b></td><td class="ltr">${esc(d.title)}</td><td class="num">${r.start?fmtDate(r.start)+' – '+fmtDate(r.end):'—'}</td><td class="num">${(d.passengers||[]).length}</td><td><span class="row" style="gap:3px">${(d.services||[]).map(s=>`<span title="${SVC_T[s.type]}">${svcIc(s.type,'xs')}</span>`).join('')}</span></td><td>${amt(k.sales,k.cur)}</td><td>${amt(k.profit,k.cur)}</td><td>${balPill(k.bal,k.cur)}</td><td><span class="pill ${d.status==='closed'?'':'acc'}">${d.status==='closed'?'סגור':'פתוח'}</span></td></tr>`}).join('')}</tbody></table></div>`:'<div class="card empty">אין דוקטים בסינון הזה</div>'}`;
+  <div class="chips">${[['open','פתוחים'],['owe','עם יתרת לקוח'],['closed','נעולים'],['all','הכל']].map(([k,t])=>`<button class="chip ${f===k?'on':''}" data-act="dkFilter" data-v="${k}">${t}</button>`).join('')}</div>
+  ${ds.length?`<div class="tbl"><table><thead><tr><th>דוקט</th><th>כותרת</th><th>תאריכים</th><th>נוסעים</th><th>שירותים</th><th>מכירות</th><th>רווח</th><th>יתרת לקוח</th><th>סטטוס</th></tr></thead><tbody>${ds.map(d=>{const k=dCalc(d),r=dRange(d);return `<tr data-act="goDocket" data-id="${d.id}"><td class="num"><b>${d.number}</b></td><td class="ltr">${esc(d.title)}</td><td class="num">${r.start?fmtDate(r.start)+' – '+fmtDate(r.end):'—'}</td><td class="num">${(d.passengers||[]).length}</td><td><span class="row" style="gap:3px">${(d.services||[]).map(s=>`<span title="${SVC_T[s.type]}">${svcIc(s.type,'xs')}</span>`).join('')}</span></td><td>${amt(k.sales,k.cur)}</td><td>${amt(k.profit,k.cur)}</td><td>${balPill(k.bal,k.cur)}</td><td><span class="pill ${d.status==='closed'?'warn':'acc'}">${d.status==='closed'?LOCKSVG+' נעול':'פתוח'}</span></td></tr>`}).join('')}</tbody></table></div>`:'<div class="card empty">אין דוקטים בסינון הזה</div>'}`;
 }
 function vCustomers(){
   const cs=vals('customers').sort((a,b)=>custLabel(a).localeCompare(custLabel(b)));
@@ -1263,21 +1270,24 @@ document.addEventListener('click',e=>{if(!e.target.closest('.search'))$('#result
 /* ---------- actions ---------- */
 const A={
   closeModal,signIn:()=>signIn(),signOut:()=>firebase.auth().signOut(),print:()=>window.print(),
-  newDocket:d=>newDocketForm(d.cust),goDocket:d=>{closeModal();location.hash='d-'+d.id},editDocket:d=>editDocketForm(d.id),
+  newDocket:d=>newDocketForm(d.cust),goDocket:d=>{closeModal();location.hash='d-'+d.id},editDocket:d=>{if(!lockGuard(d.id))editDocketForm(d.id)},
   svcForm:d=>svcForm(d.id,d.s,d.t),recForm:d=>recForm(d.id),pmtForm:d=>pmtForm(d.id,d.sup),openPay:d=>openPay(d.id),itinerary:d=>messageForm(d.id,'itinerary'),msgForm:d=>messageForm(d.id,d.k),dupDocket:d=>dupDocketForm(d.id),
   openFile:d=>openFile(d.id),delFile:async d=>{const m=S.files[d.id];if(await confirmBox('למחוק את הקובץ '+(m?.name||'')+'?','מחיקה')){await delFileRec(d.id);if(m?.supplierId)openSupplier(m.supplierId)}},
   enableNotif:()=>{Notification.requestPermission().then(()=>{renderAll();maybeNotify()})},
   repYear:d=>{ui.repYear=(ui.repYear||+todayISO().slice(0,4))+(+d.d);renderAll()},repCsv:d=>repCsv(d.k),driveBackup:()=>driveBackup(),shortLink:()=>setupShortLink(),copyShort:async()=>{try{await navigator.clipboard.writeText(SHORT_URL);toast('הכתובת הועתקה')}catch(e){toast(SHORT_URL)}},
   saveTpl:()=>{const t={};DEF_TPL.forEach(([k])=>{t[k]=$('#tpl_'+k).value});saveMeta({...S.meta,templates:t});toast('התבניות נשמרו')},
   resetTpl:async()=>{if(await confirmBox('להחזיר את כל התבניות לנוסח המקורי?','החזרה')){await saveMeta({...S.meta,templates:{}});renderAll()}},
-  addPax:d=>{const dk=S.dockets[d.id];pickCustomer('הוספת נוסע לדוקט #'+dk.number,async cid=>{const nd=clone(S.dockets[d.id]);nd.passengers=[...new Set([...(nd.passengers||[]),cid])];(nd.services||[]).forEach(s=>{if(s.status!=='cancelled')s.paxIds=[...new Set([...(s.paxIds||[]),cid])]});await saveRec('dockets',nd);toast('הנוסע נוסף')},dk.passengers||[])},
-  removePax:async d=>{if(!(await confirmBox('להסיר את הנוסע מהדוקט? הלקוח עצמו לא יימחק.','הסרה')))return;const nd=clone(S.dockets[d.id]);nd.passengers=(nd.passengers||[]).filter(x=>x!==d.c);(nd.services||[]).forEach(s=>s.paxIds=(s.paxIds||[]).filter(x=>x!==d.c));saveRec('dockets',nd)},
-  toggleClose:d=>{const nd=clone(S.dockets[d.id]);nd.status=nd.status==='closed'?'open':'closed';saveRec('dockets',nd);toast(nd.status==='closed'?'הדוקט נסגר':'הדוקט נפתח מחדש')},
-  delDocket:async d=>{const ps=vals('payments').filter(p=>p.docketId===d.id);if(!(await confirmBox(`למחוק את הדוקט${ps.length?' ואת '+ps.length+' המסמכים שלו':''}? אי אפשר לבטל.`,'מחיקה')))return;for(const p of ps)await removeRec('payments',p.id);await removeRec('dockets',d.id);location.hash='dockets'},
+  addPax:d=>{if(lockGuard(d.id))return;const dk=S.dockets[d.id];pickCustomer('הוספת נוסע לדוקט #'+dk.number,async cid=>{const nd=clone(S.dockets[d.id]);nd.passengers=[...new Set([...(nd.passengers||[]),cid])];(nd.services||[]).forEach(s=>{if(s.status!=='cancelled')s.paxIds=[...new Set([...(s.paxIds||[]),cid])]});await saveRec('dockets',nd);toast('הנוסע נוסף')},dk.passengers||[])},
+  removePax:async d=>{if(lockGuard(d.id))return;if(!(await confirmBox('להסיר את הנוסע מהדוקט? הלקוח עצמו לא יימחק.','הסרה')))return;const nd=clone(S.dockets[d.id]);nd.passengers=(nd.passengers||[]).filter(x=>x!==d.c);(nd.services||[]).forEach(s=>s.paxIds=(s.paxIds||[]).filter(x=>x!==d.c));saveRec('dockets',nd)},
+  toggleClose:async d=>{const dk=S.dockets[d.id];const lock=dk.status!=='closed';const k=dCalc(dk);
+    if(lock&&!(k.sales>0)){toast('אי אפשר לנעול דוקט בלי שירותים');return}
+    if(lock&&k.bal>0.5){openModal('אי אפשר לנעול עדיין',`<p>אפשר לנעול דוקט רק אחרי שהלקוח שילם אותו במלואו.</p><div class="kv"><div><span>סך המכירות</span><b>${amt(k.sales,k.cur)}</b></div><div><span>שולם</span><b>${amt(k.rec,k.cur)}</b></div><div><span>נשאר לתשלום</span><b style="color:var(--bad)">${amt(k.bal,k.cur)}</b></div></div><div class="actions"><button class="btn pri" data-act="recForm" data-id="${dk.id}">+ רישום תקבול</button><button class="btn" data-act="msgForm" data-id="${dk.id}" data-k="balance">תזכורת תשלום ללקוח</button><button class="btn" data-act="closeModal">סגירה</button></div>`);return}
+    if(!(await confirmBox(lock?`לנעול את דוקט #${dk.number}? הלקוח שילם במלואו.${k.supBal>0.5?` שים לב: לספקים עדיין מגיעים ${n2(k.supBal)} ${k.cur}, ואפשר לרשום להם תשלום גם אחרי הנעילה.`:''} אחרי הנעילה אי אפשר לשנות שירותים, מחירים ונוסעים עד שמבטלים אותה.`:`לבטל את הנעילה של דוקט #${dk.number}? אחרי זה אפשר יהיה לשנות אותו שוב.`,lock?'נעילה':'ביטול הנעילה')))return;const nd=clone(S.dockets[d.id]);nd.status=lock?'closed':'open';nd.lockedAt=lock?Date.now():null;await saveRec('dockets',nd);toast(lock?'הדוקט ננעל':'הנעילה בוטלה')},
+  delDocket:async d=>{if(lockGuard(d.id))return;const ps=vals('payments').filter(p=>p.docketId===d.id);if(!(await confirmBox(`למחוק את הדוקט${ps.length?' ואת '+ps.length+' המסמכים שלו':''}? אי אפשר לבטל.`,'מחיקה')))return;for(const p of ps)await removeRec('payments',p.id);await removeRec('dockets',d.id);location.hash='dockets'},
   newCustomer:()=>customerForm(),editCustomer:d=>customerForm(d.id),openCustomer:d=>openCustomer(d.id),
   delCustomer:async d=>{if(!(await confirmBox('למחוק את הלקוח? הוא יוסר גם מרשימות הנוסעים.','מחיקה')))return;for(const dk of vals('dockets').filter(x=>(x.passengers||[]).includes(d.id)||x.customerId===d.id)){const nd=clone(dk);nd.passengers=(nd.passengers||[]).filter(x=>x!==d.id);if(nd.customerId===d.id)nd.customerId='';await saveRec('dockets',nd)}removeRec('customers',d.id)},
   newSupplier:()=>supplierForm(),editSupplier:d=>supplierForm(d.id),openSupplier:d=>openSupplier(d.id),
-  delPay:async d=>{if(await confirmBox('לבטל את המסמך? היתרות יחושבו מחדש.','ביטול מסמך'))removeRec('payments',d.id)},
+  delPay:async d=>{const pd=S.payments[d.id]?.docketId;if(pd&&lockGuard(pd))return;if(await confirmBox('לבטל את המסמך? היתרות יחושבו מחדש.','ביטול מסמך'))removeRec('payments',d.id)},
   newLead:()=>leadForm(),editLead:d=>leadForm(d.id),
   moveLead:d=>{const l=clone(S.leads[d.id]);const i=STAGES.findIndex(s=>s[0]===(l.stage||'new'))+(+d.d);if(i<0||i>=STAGES.length)return;l.stage=STAGES[i][0];saveRec('leads',l)},
   leadToCustomer:async d=>{const l=S.leads[d.id];await saveRec('leads',{...clone(l),stage:'won'});customerForm(null,rec=>newDocketForm(rec.id));$('#f_nameHe').value=l.name||'';$('#f_phone').value=l.phone||'';$('#f_notes').value=[l.destination,l.dates,l.notes].filter(Boolean).join(' · ')},
@@ -1298,6 +1308,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 document.addEventListener('change',async e=>{
   const el=e.target;if(!['dkScan','dkConf','dkFile','supFile','ndScan'].includes(el.id))return;
   const files=el.files?[...el.files]:[],id=el.dataset.id;el.value='';if(!files.length)return;
+  if((el.id==='dkScan'||el.id==='dkConf')&&lockGuard(id))return;
   if(el.id==='dkScan')scanPassportsInto(id,files);
   else if(el.id==='dkConf')readConfirmation(id,files[0]);
   else if(el.id==='dkFile')uploadFiles(files,{docketId:id});
