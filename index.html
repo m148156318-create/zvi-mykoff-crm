@@ -551,6 +551,35 @@ tbody tr{transition:background .12s}
 @media (max-width:760px){.themeBtn{display:none}}
 :root[data-theme="dark"] .nbar.blue{background:linear-gradient(120deg,#2b4fb8,#4a3aa8)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nbar.blue{background:linear-gradient(120deg,#2b4fb8,#4a3aa8)}}
+/* clean home */
+.home{display:flex;flex-direction:column;gap:16px;max-width:1100px}
+.home .tiles{margin:0;gap:14px}
+.home .tile{box-shadow:none;border:1px solid var(--line);padding:18px 20px;background:var(--surface)}
+.home .tile .ic{display:none}
+.home .tile .k{font-size:13px;color:var(--muted);font-weight:600}
+.home .tile .v{font-size:28px;margin-top:2px}
+.home .grid2{gap:14px}
+.home .card{box-shadow:none;padding:18px 20px}
+.home .card h2{font-size:15px;margin-bottom:6px}
+.home .li{border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent);padding:10px 2px}
+.home .li:hover{background:transparent}
+.home .li:hover b,.home .li:hover>span{color:var(--accent)}
+.h-alerts{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 18px}
+.h-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.h-head h2{font-size:15px;display:flex;align-items:center;gap:8px}
+.h-head .cnt{background:var(--bad-soft);color:var(--bad);border-radius:999px;font-size:12px;padding:1px 8px;font-weight:700}
+.lnk{border:0;background:none;color:var(--accent);font-weight:600;cursor:pointer;font-size:13px;padding:0}
+.hal{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:4px 8px;padding:8px 0;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent);cursor:pointer;font-size:14px}
+.hal:hover .t{color:var(--accent)}
+.hal .s{font-size:12px;color:var(--muted);white-space:nowrap}
+.h-alerts details summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:13px;padding-top:8px;list-style:none}
+@media (max-width:760px){.hal{grid-template-columns:auto 1fr}.hal .s{grid-column:2}}
+/* lighter widgets column */
+.widgets{gap:14px}
+.wg{box-shadow:none;border-color:color-mix(in srgb,var(--line) 80%,transparent)}
+.wg h3{background:transparent;border-bottom:0;padding:10px 12px 4px;font-size:13px}
+.wg th{background:transparent}
+.wg td{border-top-color:color-mix(in srgb,var(--line) 60%,transparent)}
 </style>
 </head>
 <body>
@@ -1471,8 +1500,9 @@ function alerts(){
   return out.sort((a,b)=>a.o-b.o);
 }
 function alertsCard(){
-  const al=ALERTS,perm=('Notification' in window)?Notification.permission:'na';
-  return `<div class="card" style="margin-bottom:14px"><h2><span>התראות ${al.length?`<span class="pill bad">${al.length}</span>`:''}</span>${perm==='default'?'<button class="btn sm" data-act="enableNotif">הפעלת התראות בדפדפן</button>':''}</h2>${al.length?`<div class="list">${al.map(a=>`<div class="li" data-act="goDocket" data-id="${a.id}"><span style="display:flex;align-items:baseline"><i class="al-dot ${a.lvl}"></i><span>${esc(a.txt)}<span class="sub">${esc(a.sub)}</span></span></span></div>`).join('')}</div>`:'<div class="muted small">אין התראות. הכל מסודר.</div>'}</div>`;
+  const al=ALERTS,perm=('Notification' in window)?Notification.permission:'na';if(!al.length)return '';
+  const row=a=>`<div class="hal" data-act="goDocket" data-id="${a.id}"><i class="al-dot ${a.lvl}"></i><span class="t">${esc(a.txt)}</span><span class="s">${esc(a.sub)}</span></div>`;
+  return `<section class="h-alerts"><div class="h-head"><h2>דורש טיפול <span class="cnt">${al.length}</span></h2>${perm==='default'?'<button class="lnk" data-act="enableNotif">הפעלת התראות</button>':''}</div>${al.slice(0,3).map(row).join('')}${al.length>3?`<details><summary>עוד ${al.length-3}</summary>${al.slice(3).map(row).join('')}</details>`:''}</section>`;
 }
 function maybeNotify(){try{if(!('Notification' in window)||Notification.permission!=='granted'||!ALERTS.length)return;const t=todayISO();if(localStorage.getItem('zm-notified')===t)return;localStorage.setItem('zm-notified',t);const n=new Notification(`ZVI MYKOFF · ${ALERTS.length} התראות`,{body:ALERTS.slice(0,4).map(a=>a.txt).join('\n'),lang:'he',dir:'rtl'});n.onclick=()=>{window.focus();location.hash='home'}}catch(e){}}
 
@@ -1639,7 +1669,7 @@ function vHome(){
   ds.forEach(d=>{const k=dCalc(d),R=d.rates;owe+=Math.max(0,conv(k.bal,k.cur,'USD',R));sup+=Math.max(0,conv(k.supBal,k.cur,'USD',R));if((d.openDate||'').startsWith(ym)){salesM+=conv(k.sales,k.cur,'USD',R);profitM+=conv(k.profit,k.cur,'USD',R)}});
   const upcoming=open.map(d=>({d,r:dRange(d)})).filter(x=>x.r.start&&x.r.start>=t&&x.r.start<=addDays(t,30)).sort((a,b)=>a.r.start.localeCompare(b.r.start));
   const pass=[];open.forEach(d=>{const r=dRange(d);if(!r.end||r.end<t)return;(d.passengers||[]).forEach(p=>{const c=S.customers[p];if(c&&(!c.passportExp||c.passportExp<addMonths(r.end,6)))pass.push({d,c,r})})});
-  return `${alertsCard()}<div class="tiles">
+  return `<div class="home">${alertsCard()}<div class="tiles">
     <div class="tile go" role="button" tabindex="0" data-act="goList" data-h="dockets" data-f="open" style="--c:#1f63a8">${uiIc('dk','#1f63a8')}<div class="k">דוקטים פתוחים ‹</div><div class="v num">${open.length}</div></div>
     <div class="tile go" role="button" tabindex="0" data-act="goList" data-h="dockets" data-f="owe" style="--c:${owe>1?'var(--bad)':'var(--ok)'}">${uiIc('owe',owe>1?'var(--bad)':'var(--ok)')}<div class="k">לקוחות חייבים ‹</div><div class="v num ltr">$${n2(owe)}</div></div>
     <div class="tile go" role="button" tabindex="0" data-act="goList" data-h="suppliers" style="--c:#6a3fb5">${uiIc('sup','#6a3fb5')}<div class="k">לשלם לספקים ‹</div><div class="v num ltr">$${n2(sup)}</div></div>
@@ -1647,7 +1677,7 @@ function vHome(){
   </div><div class="grid2">
     <div class="card"><h2>יוצאים ב-30 הימים הקרובים</h2>${upcoming.length?`<div class="list">${upcoming.map(({d,r})=>{const k=dCalc(d);return `<div class="li" data-act="goDocket" data-id="${d.id}"><span><b class="num">#${d.number}</b> ${esc(d.title)}<span class="sub">${fmtDate(r.start)} · בעוד ${daysBetween(t,r.start)} ימים · ${(d.passengers||[]).length} נוסעים</span></span>${balPill(k.bal,k.cur)}</div>`}).join('')}</div>`:'<div class="muted small">אין יציאות בחודש הקרוב</div>'}</div>
     <div class="card"><h2>בעיות דרכון בנסיעות קרובות</h2>${pass.length?`<div class="list">${pass.map(({d,c,r})=>`<div class="li" data-act="goDocket" data-id="${d.id}"><span>${esc(custLabel(c))}<span class="sub">דוקט #${d.number} · חזרה ${fmtDate(r.end)}</span></span>${passPill(c,r.end)}</div>`).join('')}</div>`:'<div class="muted small">כל הדרכונים בתוקף לנסיעות הקרובות</div>'}</div>
-  </div>`;
+  </div></div>`;
 }
 /* ---------- NasaOS-style list screens ---------- */
 const colFilterRow=n=>`<tr class="colf">${Array.from({length:n},(_,i)=>`<th><input data-cf="${i}" aria-label="סינון עמודה" placeholder="סינון…"></th>`).join('')}</tr>`;
