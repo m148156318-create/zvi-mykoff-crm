@@ -250,6 +250,9 @@ body{background:radial-gradient(1200px 500px at 85% -10%,color-mix(in srgb,var(-
 .hero-ill{display:block;margin:0 auto 10px}
 .login{background:radial-gradient(900px 500px at 50% -10%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%),linear-gradient(160deg,var(--bg),var(--surface-2))}
 .login-card{box-shadow:var(--shadow);border-radius:20px;padding:40px 34px}
+.scanbox{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 14px;margin-bottom:14px;border-radius:12px;border:1.5px dashed color-mix(in srgb,var(--accent) 45%,transparent);background:var(--accent-soft)}
+.scanbox .btn svg{fill:currentColor}
+.scanbox #scanMsg{flex:1;min-width:200px}
 span.num.ltr{white-space:nowrap}
 .card.empty>h2{justify-content:center}
 .dk-main td.num{white-space:nowrap}
@@ -324,6 +327,7 @@ span.num.ltr{white-space:nowrap}
   </div>
 </div>
 
+<script src="mrz.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -519,8 +523,9 @@ let formPhoto='';
 function customerForm(id,onSaved){
   const c=id?clone(S.customers[id]):{title:'MR'};formPhoto=c.photo||'';
   const top=F_CUST.slice(0,12),pass=F_CUST.slice(12);
-  openModal(id?'עריכת לקוח':'לקוח חדש',`<form id="frm" onsubmit="return false">${fieldsHTML(top,c,'form three')}<div class="fsec"><h3>דרכון</h3>${fieldsHTML(pass,c)}</div></form>`+actionsHTML('שמירה'),true);
+  openModal(id?'עריכת לקוח':'לקוח חדש',`<div class="scanbox"><label class="btn pri" for="ppScan"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>סריקת דרכון</label><input type="file" id="ppScan" accept="image/*" hidden><span id="scanMsg" class="small">מצלמים או בוחרים תמונה של עמוד הפרטים בדרכון, והפרטים יתמלאו לבד.</span></div><form id="frm" onsubmit="return false">${fieldsHTML(top,c,'form three')}<div class="fsec"><h3>דרכון</h3>${fieldsHTML(pass,c)}</div></form>`+actionsHTML('שמירה'),true);
   $('#f_photo').onchange=e=>{const f=e.target.files[0];if(!f)return;shrink(f,1100,.72).then(u=>{formPhoto=u;$('#photoPrev').innerHTML=`<img class="photo" src="${u}" alt="צילום דרכון">`})};
+  $('#ppScan').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)scanPassport(f)};
   $('#frmSave').onclick=async()=>{
     const o=readFields(F_CUST,$('#frm'));if(!o)return;
     const dup=vals('customers').find(x=>x.id!==id&&((o.idNum&&x.idNum===o.idNum)||(o.passportNo&&x.passportNo===o.passportNo)));
@@ -529,6 +534,25 @@ function customerForm(id,onSaved){
     closeModal();await saveRec('customers',rec);toast('הלקוח נשמר');
     if(onSaved)onSaved(rec);else openCustomer(rec.id);
   };
+}
+function isIsraeliId(s){s=String(s||'').padStart(9,'0');if(!/^\d{9}$/.test(s)||/^0+$/.test(s))return false;let t=0;for(let i=0;i<9;i++){let d=+s[i]*((i%2)+1);t+=d>9?d-9:d}return t%10===0}
+async function scanPassport(file){
+  const msg=$('#scanMsg');if(!msg)return;
+  shrink(file,1100,.72).then(u=>{formPhoto=u;const pv=$('#photoPrev');if(pv)pv.innerHTML=`<img class="photo" src="${u}" alt="צילום דרכון">`}).catch(()=>{});
+  if(!window.MRZ){msg.textContent='רכיב הסריקה לא נטען. רענן את הדף ונסה שוב.';return}
+  msg.textContent='קורא את הדרכון…';
+  try{
+    const r=await MRZ.scan(file,(p,t)=>{if($('#scanMsg'))$('#scanMsg').textContent=(t||'קורא את הדרכון')+(p!=null&&p>0?` ${Math.round(p*100)}%`:'')});
+    if(!$('#frm'))return;
+    if(!r){msg.textContent='לא הצלחתי לקרוא את הדרכון. כדאי לצלם שוב: תמונה חדה וישרה, בלי השתקפות, שרואים בה את שתי השורות התחתונות עם הסימנים <<<.';return}
+    const set=(k,v)=>{const el=$('#f_'+k);if(el&&v)el.value=v};
+    set('lastName',r.surname);set('firstName',r.given);set('passportNo',r.passportNo);set('dob',r.dob);set('passportExp',r.passportExpiry);
+    if(r.nationality==='ISR'){set('citizenship','Israeli');set('country','Israel')}else if(r.nationality)set('citizenship',r.nationality);
+    const idOk=r.nationality==='ISR'&&r.personal&&isIsraeliId(r.personal);if(idOk)set('idNum',r.personal.padStart(9,'0'));
+    if(r.sex==='M')set('title','MR');else if(r.sex==='F')set('title','MRS');
+    msg.textContent=(r.valid?'הפרטים נקראו ומולאו. ':'חלק מהפרטים נקראו, כדאי לבדוק אותם מול הדרכון. ')+(idOk?'':'את תעודת הזהות לא מצאתי בדרכון, צריך להקליד. ')+'נשאר להשלים שם בעברית.';
+    $('#f_nameHe').focus();
+  }catch(err){msg.textContent='הסריקה נכשלה. בדוק את החיבור לאינטרנט ונסה שוב.'}
 }
 function openCustomer(id){
   const c=S.customers[id];if(!c)return;
