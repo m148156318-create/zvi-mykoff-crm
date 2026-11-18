@@ -1102,6 +1102,24 @@ async function driveBackup(){
   }catch(e){if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')return;toast('הגיבוי לדרייב נכשל ('+(e.code||e.message)+'). אפשר להוריד קובץ גיבוי במקום.')}
 }
 
+/* ---------- short address (Firebase Hosting redirect) ---------- */
+const SHORT_URL='https://zvi-mykoff-crm.web.app';
+async function setupShortLink(){
+  if(!window.firebase||!firebase.auth().currentUser)return toast('צריך להיות מחובר עם Google');
+  try{
+    const pv=new firebase.auth.GoogleAuthProvider();pv.addScope('https://www.googleapis.com/auth/firebase.hosting');
+    const r=await firebase.auth().currentUser.reauthenticateWithPopup(pv);const tok=r.credential&&r.credential.accessToken;if(!tok)throw new Error('אין הרשאה');
+    toast('מפעיל את הכתובת הקצרה…');
+    const site=FIREBASE_CONFIG.projectId,A='https://firebasehosting.googleapis.com/v1beta1',H={Authorization:'Bearer '+tok,'Content-Type':'application/json'};
+    const call=async(url,opt)=>{let res=await fetch(url,{...opt,headers:H});if(res.status===403){res=await fetch(url,{...opt,headers:{...H,'x-goog-user-project':site}})}if(!res.ok)throw new Error('Hosting '+res.status+' '+(await res.text()).slice(0,120));return res.json()};
+    const target=location.origin+location.pathname;
+    const v=await call(`${A}/sites/${site}/versions`,{method:'POST',body:JSON.stringify({config:{redirects:[{glob:'**',location:target,statusCode:302}]}})});
+    await call(`${A}/${v.name}?update_mask=status`,{method:'PATCH',body:JSON.stringify({status:'FINALIZED'})});
+    await call(`${A}/sites/${site}/releases?versionName=${encodeURIComponent(v.name)}`,{method:'POST',body:'{}'});
+    await saveMeta({...S.meta,shortLink:SHORT_URL});renderAll();toast('הכתובת הקצרה פעילה: zvi-mykoff-crm.web.app');
+  }catch(e){if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')return;toast('לא הצלחתי להפעיל ('+(e.code||e.message)+')')}
+}
+
 /* ---------- views ---------- */
 function route(){const h=location.hash.slice(1);if(h.startsWith('d-'))return ['docket',h.slice(2)];return [NAV.some(n=>n[0]===h)?h:'home']}
 function renderAll(){
@@ -1191,6 +1209,7 @@ function vBackup(){
     <p class="small muted" style="margin-top:10px">גיבוי אחרון: <b>${m.lastBackup?new Date(m.lastBackup).toLocaleString('he-IL'):'עוד לא בוצע'}</b>. הגיבוי לדרייב נשמר בתיקייה "ZVI MYKOFF גיבויים". קבצים מצורפים נשמרים בענן ולא נכללים בקובץ הגיבוי.</p>
     <p class="small muted">דוקטים ${vals('dockets').length} · לקוחות ${vals('customers').length} · ספקים ${vals('suppliers').length} · מסמכים ${vals('payments').length} · קבצים ${vals('files').length}</p>
     <div class="row"><button class="btn" data-act="loadDemo">טעינת נתוני דוגמה</button></div></div></div>
+  <div class="card" style="margin-top:12px"><h2>כתובת קצרה לשליחה</h2><p>הכתובת לשליחה: <b class="ltr">zvi-mykoff-crm.web.app</b> ${m.shortLink?'<span class="pill ok">פעילה</span>':'<span class="pill warn">עוד לא הופעלה</span>'}</p><div class="row"><button class="btn ${m.shortLink?'':'pri'}" data-act="shortLink">${m.shortLink?'הפעלה מחדש':'הפעלת הכתובת הקצרה'}</button><button class="btn" data-act="copyShort">העתקת הכתובת</button></div><p class="small muted">בלחיצה ייפתח חלון של Google שמבקש אישור לנהל את האתר ב-Firebase. מאשרים פעם אחת, וזהו.</p></div>
   <div class="card tpl" style="margin-top:12px"><h2>תבניות הודעות ללקוחות</h2><p class="small muted">אפשר לכתוב בתבנית: <span class="ltr">{שם} {דוקט} {יתרה} {תאריך} {טיסות} {PNR} {מסלול} {עסק}</span>, והם יוחלפו בפרטים של הדוקט.</p>
     <div class="grid2">${DEF_TPL.map(([k,l])=>`<label class="form" style="display:block" for="tpl_${k}"><span class="small" style="font-weight:700;display:block;margin-bottom:4px">${l}</span><textarea id="tpl_${k}">${esc(tplText(k))}</textarea></label>`).join('')}</div>
     <div class="actions"><button class="btn pri" data-act="saveTpl">שמירת התבניות</button><button class="btn" data-act="resetTpl">החזרה לנוסח המקורי</button></div></div>`;
@@ -1248,7 +1267,7 @@ const A={
   svcForm:d=>svcForm(d.id,d.s,d.t),recForm:d=>recForm(d.id),pmtForm:d=>pmtForm(d.id,d.sup),openPay:d=>openPay(d.id),itinerary:d=>messageForm(d.id,'itinerary'),msgForm:d=>messageForm(d.id,d.k),dupDocket:d=>dupDocketForm(d.id),
   openFile:d=>openFile(d.id),delFile:async d=>{const m=S.files[d.id];if(await confirmBox('למחוק את הקובץ '+(m?.name||'')+'?','מחיקה')){await delFileRec(d.id);if(m?.supplierId)openSupplier(m.supplierId)}},
   enableNotif:()=>{Notification.requestPermission().then(()=>{renderAll();maybeNotify()})},
-  repYear:d=>{ui.repYear=(ui.repYear||+todayISO().slice(0,4))+(+d.d);renderAll()},repCsv:d=>repCsv(d.k),driveBackup:()=>driveBackup(),
+  repYear:d=>{ui.repYear=(ui.repYear||+todayISO().slice(0,4))+(+d.d);renderAll()},repCsv:d=>repCsv(d.k),driveBackup:()=>driveBackup(),shortLink:()=>setupShortLink(),copyShort:async()=>{try{await navigator.clipboard.writeText(SHORT_URL);toast('הכתובת הועתקה')}catch(e){toast(SHORT_URL)}},
   saveTpl:()=>{const t={};DEF_TPL.forEach(([k])=>{t[k]=$('#tpl_'+k).value});saveMeta({...S.meta,templates:t});toast('התבניות נשמרו')},
   resetTpl:async()=>{if(await confirmBox('להחזיר את כל התבניות לנוסח המקורי?','החזרה')){await saveMeta({...S.meta,templates:{}});renderAll()}},
   addPax:d=>{const dk=S.dockets[d.id];pickCustomer('הוספת נוסע לדוקט #'+dk.number,async cid=>{const nd=clone(S.dockets[d.id]);nd.passengers=[...new Set([...(nd.passengers||[]),cid])];(nd.services||[]).forEach(s=>{if(s.status!=='cancelled')s.paxIds=[...new Set([...(s.paxIds||[]),cid])]});await saveRec('dockets',nd);toast('הנוסע נוסף')},dk.passengers||[])},
