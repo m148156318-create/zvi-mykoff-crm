@@ -242,6 +242,9 @@ body{background:radial-gradient(1200px 500px at 85% -10%,color-mix(in srgb,var(-
 .tile{position:relative;padding:14px 16px 14px 56px;border-top:3px solid var(--c,var(--accent))}
 .tile .ic{position:absolute;top:14px;inset-inline-end:14px}
 .tile .v{font-size:25px}
+.tile.go{cursor:pointer;transition:transform .12s,box-shadow .12s}
+.tile.go:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(15,30,60,.12)}
+.tile.go:active{transform:none}
 .tbl tbody tr:nth-child(even){background:color-mix(in srgb,var(--surface-2) 60%,transparent)}
 .tbl thead th{position:sticky;top:0;z-index:1}
 .wg{border-radius:14px;background:var(--surface)}
@@ -1208,10 +1211,10 @@ function vHome(){
   const upcoming=open.map(d=>({d,r:dRange(d)})).filter(x=>x.r.start&&x.r.start>=t&&x.r.start<=addDays(t,30)).sort((a,b)=>a.r.start.localeCompare(b.r.start));
   const pass=[];open.forEach(d=>{const r=dRange(d);if(!r.end||r.end<t)return;(d.passengers||[]).forEach(p=>{const c=S.customers[p];if(c&&(!c.passportExp||c.passportExp<addMonths(r.end,6)))pass.push({d,c,r})})});
   return `${alertsCard()}<div class="tiles">
-    <div class="tile" style="--c:#1f63a8">${uiIc('dk','#1f63a8')}<div class="k">דוקטים פתוחים</div><div class="v num">${open.length}</div></div>
-    <div class="tile" style="--c:${owe>1?'var(--bad)':'var(--ok)'}">${uiIc('owe',owe>1?'var(--bad)':'var(--ok)')}<div class="k">לקוחות חייבים (₪)</div><div class="v num">${n2(owe)}</div></div>
-    <div class="tile" style="--c:#6a3fb5">${uiIc('sup','#6a3fb5')}<div class="k">לשלם לספקים (₪)</div><div class="v num">${n2(sup)}</div></div>
-    <div class="tile" style="--c:#d6950f">${uiIc('chart','#d6950f')}<div class="k">מכירות החודש (₪)</div><div class="v num">${n2(salesM)}</div><div class="k num">רווח ${n2(profitM)}</div></div>
+    <div class="tile go" role="button" tabindex="0" data-act="goList" data-h="dockets" data-f="open" style="--c:#1f63a8">${uiIc('dk','#1f63a8')}<div class="k">דוקטים פתוחים ‹</div><div class="v num">${open.length}</div></div>
+    <div class="tile go" role="button" tabindex="0" data-act="goList" data-h="dockets" data-f="owe" style="--c:${owe>1?'var(--bad)':'var(--ok)'}">${uiIc('owe',owe>1?'var(--bad)':'var(--ok)')}<div class="k">לקוחות חייבים (₪) ‹</div><div class="v num">${n2(owe)}</div></div>
+    <div class="tile go" role="button" tabindex="0" data-act="goList" data-h="suppliers" style="--c:#6a3fb5">${uiIc('sup','#6a3fb5')}<div class="k">לשלם לספקים (₪) ‹</div><div class="v num">${n2(sup)}</div></div>
+    <div class="tile go" role="button" tabindex="0" data-act="goList" data-h="reports" style="--c:#d6950f">${uiIc('chart','#d6950f')}<div class="k">מכירות החודש (₪) ‹</div><div class="v num">${n2(salesM)}</div><div class="k num">רווח ${n2(profitM)}</div></div>
   </div><div class="grid2">
     <div class="card"><h2>יוצאים ב-30 הימים הקרובים</h2>${upcoming.length?`<div class="list">${upcoming.map(({d,r})=>{const k=dCalc(d);return `<div class="li" data-act="goDocket" data-id="${d.id}"><span><b class="num">#${d.number}</b> ${esc(d.title)}<span class="sub">${fmtDate(r.start)} · בעוד ${daysBetween(t,r.start)} ימים · ${(d.passengers||[]).length} נוסעים</span></span>${balPill(k.bal,k.cur)}</div>`}).join('')}</div>`:'<div class="muted small">אין יציאות בחודש הקרוב</div>'}</div>
     <div class="card"><h2>בעיות דרכון בנסיעות קרובות</h2>${pass.length?`<div class="list">${pass.map(({d,c,r})=>`<div class="li" data-act="goDocket" data-id="${d.id}"><span>${esc(custLabel(c))}<span class="sub">דוקט #${d.number} · חזרה ${fmtDate(r.end)}</span></span>${passPill(c,r.end)}</div>`).join('')}</div>`:'<div class="muted small">כל הדרכונים בתוקף לנסיעות הקרובות</div>'}</div>
@@ -1327,6 +1330,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.search'))$('#result
 
 /* ---------- actions ---------- */
 const A={
+  goList:d=>{if(d.f)ui.dkFilter=d.f;if(location.hash==='#'+d.h)renderAll();else location.hash=d.h},
   closeModal,signIn:()=>signIn(),signOut:()=>firebase.auth().signOut(),print:()=>window.print(),
   newDocket:d=>newDocketForm(d.cust),goDocket:d=>{closeModal();location.hash='d-'+d.id},editDocket:d=>{if(!lockGuard(d.id))editDocketForm(d.id)},
   svcForm:d=>svcForm(d.id,d.s,d.t),recForm:d=>recForm(d.id),pmtForm:d=>pmtForm(d.id,d.sup),openPay:d=>openPay(d.id),itinerary:d=>messageForm(d.id,'itinerary'),msgForm:d=>messageForm(d.id,d.k),dupDocket:d=>dupDocketForm(d.id),
@@ -1362,7 +1366,7 @@ const A={
 };
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;if(el.closest('.segs'))return;e.preventDefault();$('#results').classList.remove('show');const f=A[el.dataset.act];if(f)f(el.dataset)});
 $('#modalBg').addEventListener('mousedown',e=>{if(e.target.id==='modalBg')closeModal()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.key==='Enter'&&e.target.matches('.tile.go'))e.target.click()});
 document.addEventListener('change',async e=>{
   const el=e.target;if(!['dkScan','dkConf','dkFile','supFile','ndScan'].includes(el.id))return;
   const files=el.files?[...el.files]:[],id=el.dataset.id;el.value='';if(!files.length)return;
