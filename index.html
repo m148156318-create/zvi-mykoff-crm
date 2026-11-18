@@ -259,6 +259,21 @@ body{background:radial-gradient(1200px 500px at 85% -10%,color-mix(in srgb,var(-
 .hero-ill{display:block;margin:0 auto 10px}
 .login{background:radial-gradient(900px 500px at 50% -10%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%),linear-gradient(160deg,var(--bg),var(--surface-2))}
 .login-card{box-shadow:var(--shadow);border-radius:20px;padding:40px 34px}
+.lock{position:fixed;inset:0;z-index:100;background:radial-gradient(800px 500px at 50% -10%,#2a2618,transparent 70%),#0b0b0a;color:#f3e7c6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}
+.lock[hidden]{display:none}
+.lock h2{color:#f3e7c6;font-size:18px;font-weight:600}
+.lock .err{color:#ff9b8f;min-height:20px;font-size:14px}
+.dots{display:flex;gap:14px;direction:ltr}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid #d8a94a}
+.dots i.f{background:#d8a94a}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:14px;direction:ltr}
+.pad button{width:72px;height:72px;border-radius:50%;border:1px solid rgba(216,169,74,.45);background:rgba(255,255,255,.04);color:#f3e7c6;font-size:26px;font-family:var(--font-display);cursor:pointer}
+.pad button:active{background:rgba(216,169,74,.25)}
+.pad .x{border:0;background:none;font-size:15px}
+.lock .linkbtn{color:#d8a94a}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
 .badge{margin-inline-start:auto;background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:0 7px;font-weight:700;line-height:18px}
 .dk-acts label{color:#fff;text-align:start;padding:6px 8px;border-radius:6px;cursor:pointer;font-weight:600}
 .dk-acts label:hover{background:var(--panel-2)}
@@ -395,6 +410,14 @@ span.num.ltr{white-space:nowrap}
 </div>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast"></div>
+<div class="lock" id="lock" hidden>
+  <img src="icons/icon-192.png?v=gold" width="84" height="84" alt="" style="border-radius:20px">
+  <h2 id="lockTitle">הקלדת קוד</h2>
+  <div class="dots" id="lockDots"></div>
+  <div class="err" id="lockErr" role="alert"></div>
+  <div class="pad" id="lockPad"></div>
+  <button class="linkbtn" id="lockForgot" type="button">שכחתי את הקוד</button>
+</div>
 <div class="login" id="login" hidden>
   <div class="login-card">
     <img src="icons/icon-192.png?v=gold" width="96" height="96" alt="" style="border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,.3)">
@@ -1170,6 +1193,70 @@ async function driveBackup(){
 const LOCKSVG='<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:-2px;fill:currentColor"><path d="M17 9V7A5 5 0 0 0 7 7v2a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zM9 7a3 3 0 0 1 6 0v2H9z"/></svg>';
 const isLocked=id=>S.dockets[id]?.status==='closed';
 const lockGuard=id=>{if(isLocked(id)){toast('הדוקט נעול. כדי לשנות, פותחים קודם את הנעילה');return true}return false};
+
+/* ---------- app lock (PIN / fingerprint), per device ---------- */
+const LK='zm-lock';
+const lockCfg=()=>{try{return JSON.parse(localStorage.getItem(LK)||'null')}catch(e){return null}};
+const setLockCfg=c=>{try{c?localStorage.setItem(LK,JSON.stringify(c)):localStorage.removeItem(LK)}catch(e){}};
+const b64=buf=>btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function hashPin(pin,salt){const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+pin));return b64(d)}
+async function bioAvailable(){try{return !!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return false}}
+let lockEntry='',lockMode='unlock',lockTmp='',lockFails=0,hiddenAt=0;
+function drawLock(){
+  const n=lockMode==='unlock'?(lockCfg()?.len||4):6;
+  $('#lockDots').innerHTML=Array.from({length:Math.max(4,lockMode==='unlock'?n:Math.max(4,lockEntry.length))},(_,i)=>`<i class="${i<lockEntry.length?'f':''}"></i>`).join('');
+  const bio=lockMode==='unlock'&&lockCfg()?.bio;
+  $('#lockPad').innerHTML=[1,2,3,4,5,6,7,8,9].map(d=>`<button type="button" data-k="${d}">${d}</button>`).join('')+(bio?`<button type="button" class="x" data-k="bio" aria-label="טביעת אצבע"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#d8a94a" stroke-width="1.7" stroke-linecap="round"><path d="M12 11v3m-3-1c0 3 1 5 2 6m4-6c0 2-.5 4-1.5 6M6.5 9.5A6 6 0 0 1 18 11c0 1-.1 2-.3 3M5 13c0-1 .1-2 .4-3M8 5.5A8 8 0 0 1 19.5 8M12 8a3 3 0 0 1 3 3"/></svg></button>`:(lockMode!=='unlock'?`<button type="button" class="x" data-k="ok">אישור</button>`:'<span></span>'))+`<button type="button" data-k="0">0</button><button type="button" class="x" data-k="del" aria-label="מחיקה">⌫</button>`;
+}
+function showLock(mode){lockMode=mode||'unlock';lockEntry='';$('#lockErr').textContent='';$('#lockTitle').textContent=lockMode==='unlock'?'הקלדת קוד':lockMode==='set1'?'בחירת קוד חדש (4–6 ספרות)':'הקלדת הקוד שוב לאישור';$('#lockForgot').hidden=lockMode!=='unlock';$('#lock').hidden=false;drawLock();if(lockMode==='unlock'&&lockCfg()?.bio)setTimeout(bioUnlock,300)}
+function hideLock(){$('#lock').hidden=true;lockEntry=''}
+async function bioUnlock(){
+  const c=lockCfg();if(!c?.bio)return;
+  try{await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(c.bio),transports:['internal']}],userVerification:'required',timeout:60000}});lockFails=0;hideLock()}
+  catch(e){$('#lockErr').textContent='לא זוהה. אפשר להקליד את הקוד.'}
+}
+async function lockKey(k){
+  if(k==='bio')return bioUnlock();
+  if(k==='del'){lockEntry=lockEntry.slice(0,-1);return drawLock()}
+  if(k==='ok'){if(lockEntry.length<4){$('#lockErr').textContent='הקוד צריך להיות לפחות 4 ספרות';return}return lockSubmit()}
+  if(lockEntry.length>=6)return;lockEntry+=k;drawLock();
+  if(lockMode==='unlock'&&lockEntry.length===(lockCfg()?.len||4))lockSubmit();
+}
+async function lockSubmit(){
+  const c=lockCfg();
+  if(lockMode==='unlock'){
+    if(await hashPin(lockEntry,c.salt)===c.hash){lockFails=0;hideLock();return}
+    lockFails++;lockEntry='';drawLock();$('#lockDots').classList.remove('shake');void $('#lockDots').offsetWidth;$('#lockDots').classList.add('shake');
+    $('#lockErr').textContent=lockFails>=5?'5 ניסיונות שגויים. אפשר ללחוץ "שכחתי את הקוד".':'קוד שגוי';return;
+  }
+  if(lockMode==='set1'){lockTmp=lockEntry;showLock('set2');return}
+  if(lockMode==='set2'){
+    if(lockEntry!==lockTmp){showLock('set1');$('#lockErr').textContent='הקודים לא תאמו. מתחילים מחדש.';return}
+    const salt=b64(crypto.getRandomValues(new Uint8Array(12)));const old=lockCfg()||{};
+    setLockCfg({...old,salt,hash:await hashPin(lockEntry,salt),len:lockEntry.length,timeout:old.timeout??1});
+    hideLock();toast('הקוד נשמר. מעכשיו האפליקציה תינעל');renderAll();
+  }
+}
+async function enableBio(){
+  if(!lockCfg())return toast('קודם מגדירים קוד');
+  try{
+    const cred=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'ZVI MYKOFF',id:location.hostname},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'zvi-mykoff',displayName:'ZVI MYKOFF'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000}});
+    setLockCfg({...lockCfg(),bio:b64(cred.rawId)});toast('טביעת האצבע הופעלה');renderAll();
+  }catch(e){toast('לא הצלחתי להפעיל טביעת אצבע במכשיר הזה')}
+}
+$('#lockPad').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b)lockKey(b.dataset.k)});
+document.addEventListener('keydown',e=>{if($('#lock').hidden)return;if(/^\d$/.test(e.key))lockKey(e.key);else if(e.key==='Backspace')lockKey('del');else if(e.key==='Enter'&&lockMode!=='unlock')lockKey('ok')});
+$('#lockForgot').onclick=async()=>{setLockCfg(null);hideLock();try{await firebase.auth().signOut()}catch(e){}toast('הקוד בוטל. נכנסים מחדש עם Google ומגדירים קוד חדש')};
+document.addEventListener('visibilitychange',()=>{const c=lockCfg();if(!c)return;if(document.hidden)hiddenAt=Date.now();else if(hiddenAt&&Date.now()-hiddenAt>=(+c.timeout||0)*60000&&$('#lock').hidden)showLock('unlock')});
+function lockCard(){
+  const c=lockCfg();
+  return `<div class="card" style="margin-top:12px"><h2>נעילת האפליקציה</h2>
+  <p>${c?`<span class="pill ok">פעילה</span> קוד של ${c.len} ספרות${c.bio?' · טביעת אצבע / זיהוי פנים פעיל':''}`:'<span class="pill">כבויה</span> כרגע האפליקציה נפתחת בלי קוד.'}</p>
+  <div class="row">${c?`<button class="btn" data-act="lockSet">החלפת קוד</button>${c.bio?'<button class="btn" data-act="lockBioOff">ביטול טביעת אצבע</button>':'<button class="btn pri" data-act="lockBio" id="bioBtn">הפעלת טביעת אצבע / זיהוי פנים</button>'}<label class="small" for="lockTo" style="display:flex;gap:6px;align-items:center">ננעלת אחרי<select id="lockTo">${[[0,'מיד'],[1,'דקה'],[5,'5 דקות'],[15,'רבע שעה'],[60,'שעה']].map(([v,t])=>`<option value="${v}" ${(+c.timeout||0)===v?'selected':''}>${t}</option>`).join('')}</select>ברקע</label><button class="btn danger" data-act="lockOff">כיבוי הנעילה</button>`:'<button class="btn pri" data-act="lockSet">הגדרת קוד</button>'}</div>
+  <p class="small muted">הנעילה נשמרת בכל מכשיר בנפרד: בטלפון מגדירים בטלפון, ובמחשב במחשב. אם שוכחים את הקוד, לוחצים "שכחתי את הקוד" ונכנסים מחדש עם Google.</p></div>`;
+}
+
 /* ---------- short address (Firebase Hosting redirect) ---------- */
 const SHORT_URL='https://zvi-mykoff-crm.web.app';
 async function setupShortLink(){
@@ -1277,6 +1364,7 @@ function vBackup(){
     <p class="small muted" style="margin-top:10px">גיבוי אחרון: <b>${m.lastBackup?new Date(m.lastBackup).toLocaleString('he-IL'):'עוד לא בוצע'}</b>. הגיבוי לדרייב נשמר בתיקייה "ZVI MYKOFF גיבויים". קבצים מצורפים נשמרים בענן ולא נכללים בקובץ הגיבוי.</p>
     <p class="small muted">דוקטים ${vals('dockets').length} · לקוחות ${vals('customers').length} · ספקים ${vals('suppliers').length} · מסמכים ${vals('payments').length} · קבצים ${vals('files').length}</p>
     <div class="row"><button class="btn" data-act="loadDemo">טעינת נתוני דוגמה</button></div></div></div>
+  ${lockCard()}
   <div class="card" style="margin-top:12px"><h2>כתובת קצרה לשליחה</h2><p>הכתובת לשליחה: <b class="ltr">zvi-mykoff-crm.web.app</b> ${m.shortLink?'<span class="pill ok">פעילה</span>':'<span class="pill warn">עוד לא הופעלה</span>'}</p><div class="row"><button class="btn ${m.shortLink?'':'pri'}" data-act="shortLink">${m.shortLink?'הפעלה מחדש':'הפעלת הכתובת הקצרה'}</button><button class="btn" data-act="copyShort">העתקת הכתובת</button></div><p class="small muted">בלחיצה ייפתח חלון של Google שמבקש אישור לנהל את האתר ב-Firebase. מאשרים פעם אחת, וזהו.</p></div>
   <div class="card tpl" style="margin-top:12px"><h2>תבניות הודעות ללקוחות</h2><p class="small muted">אפשר לכתוב בתבנית: <span class="ltr">{שם} {דוקט} {יתרה} {תאריך} {טיסות} {PNR} {מסלול} {עסק}</span>, והם יוחלפו בפרטים של הדוקט.</p>
     <div class="grid2">${DEF_TPL.map(([k,l])=>`<label class="form" style="display:block" for="tpl_${k}"><span class="small" style="font-weight:700;display:block;margin-bottom:4px">${l}</span><textarea id="tpl_${k}">${esc(tplText(k))}</textarea></label>`).join('')}</div>
@@ -1330,6 +1418,8 @@ document.addEventListener('click',e=>{if(!e.target.closest('.search'))$('#result
 
 /* ---------- actions ---------- */
 const A={
+  lockSet:()=>showLock('set1'),lockBio:()=>enableBio(),lockBioOff:()=>{const c=lockCfg();delete c.bio;setLockCfg(c);renderAll()},
+  lockOff:()=>{const c=lockCfg();if(!c)return;showLock('unlock');const wait=setInterval(()=>{if($('#lock').hidden){clearInterval(wait);setLockCfg(null);toast('הנעילה כובתה');renderAll()}},300)},
   goList:d=>{if(d.f)ui.dkFilter=d.f;if(location.hash==='#'+d.h)renderAll();else location.hash=d.h},
   closeModal,signIn:()=>signIn(),signOut:()=>firebase.auth().signOut(),print:()=>window.print(),
   newDocket:d=>newDocketForm(d.cust),goDocket:d=>{closeModal();location.hash='d-'+d.id},editDocket:d=>{if(!lockGuard(d.id))editDocketForm(d.id)},
@@ -1377,6 +1467,7 @@ document.addEventListener('change',async e=>{
   else if(el.id==='supFile'){await uploadFiles(files,{supplierId:id});openSupplier(id)}
   else if(el.id==='ndScan'){closeModal();createDocketFromPassports(files)}
 });
+document.addEventListener('change',e=>{if(e.target.id==='lockTo'){const c=lockCfg();if(c){c.timeout=+e.target.value;setLockCfg(c);toast('נשמר')}}});
 document.addEventListener('change',async e=>{
   if(e.target.id!=='imp')return;const file=e.target.files[0];if(!file)return;
   try{const d=JSON.parse(await file.text());if(d.app!=='zm-crm')throw 0;const n=KINDS.reduce((a,k)=>a+(d[k]||[]).length,0);
@@ -1408,6 +1499,7 @@ async function loadDemo(){
   await saveRec('leads',{id:newId(),name:'משפחת אזולאי',destination:'תאילנד',dates:'פברואר',pax:4,stage:'new',createdAt:Date.now()});
   location.hash='d-'+d1.id;
 }
+if(lockCfg())showLock('unlock');
 boot();
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
