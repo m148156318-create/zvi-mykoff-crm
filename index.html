@@ -292,15 +292,62 @@ span.num.ltr{white-space:nowrap}
 }
 @media (max-width:760px){
   .app{grid-template-columns:1fr}
-  .rail{position:static;height:auto;flex-direction:column;border-inline-end:0;border-bottom:1px solid var(--line)}
-  .nav{flex-direction:row;overflow-x:auto}
+  .main{padding:10px 10px 40px}
+  .rail{position:static;height:auto;flex-direction:column;border-inline-end:0;border-bottom:1px solid var(--line);padding:10px}
+  .nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}
   .nav a,.nav button{white-space:nowrap;width:auto}
   .nav .new{margin-bottom:0}
+  .nav a.on::before{display:none}
   .rail-foot{margin-top:0}
+  .appbar{padding:12px;gap:10px}
+  .appbar .search{max-width:none;min-width:0;flex-basis:100%}
+  .hello b{font-size:17px}
   .dk{grid-template-columns:1fr}
-  .dk-side{position:static}
-  .form,.form.three{grid-template-columns:1fr}
+  .dk-side{position:static;padding:12px}
+  .dk-acts{flex-direction:row;flex-wrap:wrap}
+  .dk-acts button,.dk-acts label{background:rgba(255,255,255,.12);font-size:13px;padding:6px 10px}
+  .dk-main .grid2,.grid2{grid-template-columns:1fr}
+  .form,.form.three{grid-template-columns:1fr 1fr}
+  .form .full,.form label.full{grid-column:1/-1}
+  .modal-bg{padding:0;align-items:stretch}
+  .modal,.modal.wide{max-width:100%;width:100%;min-height:100%;border-radius:0;padding:14px 12px 24px;overflow-x:hidden}
+  .modal-head{position:sticky;top:-14px;background:var(--surface);z-index:2;padding-top:10px}
+  .actions{position:sticky;bottom:-24px;background:var(--surface);padding:10px 0;margin-bottom:-10px;border-top:1px solid var(--line)}
+  .actions .btn{flex:1;justify-content:center}
+  .segs thead{display:none}
+  .segs,.segs tbody{display:block;width:100%}
+  .segs tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--surface-2)}
+  .segs td{display:flex;flex-direction:column;gap:3px;padding:0;min-width:0}
+  .segs td[data-l]::before{content:attr(data-l);font-size:11.5px;font-weight:700;color:var(--muted)}
+  .segs td input{width:100%;min-width:0}
+  .segs td.segdel{grid-column:1/-1;align-items:flex-start}
+  .pp tr{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pp td:first-child{grid-column:1/-1;font-weight:700}
+  .svct{min-width:0!important}
+  .svct thead{display:none}
+  .svct,.svct tbody{display:block}
+  .svct tr{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;padding:12px;border-bottom:1px solid var(--line)}
+  .svct td{border:0;padding:0;white-space:normal}
+  .svct td:nth-child(1){display:none}
+  .svct td:nth-child(2){grid-column:1/-1}
+  .svct td:nth-child(6){grid-column:1/-1;max-width:none}
+  .svct td:nth-child(3)::before{content:"נוסעים: ";color:var(--muted);font-size:12px}
+  .svct td:nth-child(4)::before{content:"מ-";color:var(--muted);font-size:12px}
+  .svct td:nth-child(5)::before{content:"עד ";color:var(--muted);font-size:12px}
+  .svct td:nth-child(7)::before{content:"PNR ";color:var(--muted);font-size:12px}
+  .svct td:nth-child(8)::before{content:"סכום ";color:var(--muted);font-size:12px}
+  .svct td:nth-child(9)::before{content:"בדוקט ";color:var(--muted);font-size:12px}
+  .svct td:nth-child(10)::before{content:"ספק: ";color:var(--muted);font-size:12px}
+  .svct td.empty{grid-column:1/-1}
+  .svc-btn{min-width:calc(25% - 6px);padding:8px 2px}
+  .tiles{grid-template-columns:1fr 1fr}
+  .tile{padding:12px}
+  .tile .v{font-size:20px}
+  .tile .ic{display:none}
+  .dk-totals{grid-template-columns:1fr 1fr}
+  .board{grid-template-columns:repeat(5,80vw)}
 }
+@media (max-width:420px){.form,.form.three{grid-template-columns:1fr}.svc-btn{min-width:calc(33% - 6px)}}
 </style>
 </head>
 <body>
@@ -749,7 +796,7 @@ function svcForm(did,sid,type,pre){
     <div class="fsec"><h3><span>מחיר</span><label class="small" style="display:flex;gap:6px;align-items:center;font-weight:600;cursor:pointer"><input type="checkbox" id="perPax" ${s.perPax?'checked':''}> מחיר לפי נוסע (מבוגר / ילד / תינוק)</label></h3>${fieldsHTML(F_SVC_P,s,'form three')}<div id="ppBox" style="margin-top:10px"></div><div class="calc" id="calc"></div></div>
   </form>`+actionsHTML('שמירה',sid?`<button class="btn danger" id="svcDel">מחיקת השירות</button>`:''),true);
   let segs=clone(s.segments||[]);
-  const drawSegs=()=>{$('#segBody').innerHTML=segs.map((g,i)=>`<tr data-i="${i}"><td><input name="from" value="${esc(g.from||'')}" dir="ltr" placeholder="TLV" style="text-transform:uppercase"></td><td><input name="to" value="${esc(g.to||'')}" dir="ltr" placeholder="KRK" style="text-transform:uppercase"></td><td><input name="flight" value="${esc(g.flight||'')}" dir="ltr" placeholder="LY5119" style="text-transform:uppercase"></td><td><input type="date" name="date" value="${esc(g.date||'')}"></td><td><input type="time" name="dep" value="${esc(g.dep||'')}"></td><td><input type="time" name="arr" value="${esc(g.arr||'')}"></td><td><button class="btn sm danger" type="button" data-seg-del="${i}" aria-label="מחיקת קטע">×</button></td></tr>`).join('')};
+  const drawSegs=()=>{$('#segBody').innerHTML=segs.map((g,i)=>`<tr data-i="${i}"><td data-l="מ-"><input name="from" value="${esc(g.from||'')}" dir="ltr" placeholder="TLV" style="text-transform:uppercase"></td><td data-l="אל"><input name="to" value="${esc(g.to||'')}" dir="ltr" placeholder="KRK" style="text-transform:uppercase"></td><td data-l="טיסה"><input name="flight" value="${esc(g.flight||'')}" dir="ltr" placeholder="LY5119" style="text-transform:uppercase"></td><td data-l="תאריך"><input type="date" name="date" value="${esc(g.date||'')}"></td><td data-l="המראה"><input type="time" name="dep" value="${esc(g.dep||'')}"></td><td data-l="נחיתה"><input type="time" name="arr" value="${esc(g.arr||'')}"></td><td class="segdel"><button class="btn sm danger" type="button" data-seg-del="${i}" aria-label="מחיקת קטע">×</button></td></tr>`).join('')};
   const readSegs=()=>[...document.querySelectorAll('#segBody tr')].map(tr=>{const g={};tr.querySelectorAll('input').forEach(i=>g[i.name]=['from','to','flight'].includes(i.name)?i.value.trim().toUpperCase():i.value);return g});
   drawSegs();
   $('#segAdd').onclick=()=>{segs=readSegs();const last=segs[segs.length-1]||{};segs.push({from:last.to||'',date:last.date||''});drawSegs()};
@@ -761,7 +808,7 @@ function svcForm(did,sid,type,pre){
     const on=$('#perPax').checked;['base','tax','fee','sell'].forEach(k=>{$('#f_'+k).closest('label').hidden=on});
     if(!on){$('#ppBox').innerHTML='';return}
     const ids=selPax(),st=$('#f_start').value||dRange(d).start;
-    $('#ppBox').innerHTML=ids.length?`<table class="segs pp"><thead><tr><th>נוסע</th><th>סוג</th><th>מחיר בסיס</th><th>מיסים</th><th>דמי שירות</th><th>מחיר מכירה</th></tr></thead><tbody>${ids.map(cid=>{const c=S.customers[cid],p=pp[cid]||{};return `<tr data-c="${cid}"><td>${esc(custLabel(c))}</td><td><span class="pill ptype">${paxType(c,st)}</span></td>${['base','tax','fee','sell'].map(k=>`<td><input type="number" step="any" name="${k}" value="${esc(p[k]??'')}" aria-label="${k}"></td>`).join('')}</tr>`}).join('')}</tbody></table><button class="btn sm" type="button" id="ppCopy" style="margin-top:6px">העתקת השורה הראשונה מכל סוג לשאר הנוסעים מאותו סוג</button>`:'<div class="muted small">מסמנים נוסעים בשירות כדי לתמחר כל אחד.</div>';
+    $('#ppBox').innerHTML=ids.length?`<table class="segs pp"><thead><tr><th>נוסע</th><th>סוג</th><th>מחיר בסיס</th><th>מיסים</th><th>דמי שירות</th><th>מחיר מכירה</th></tr></thead><tbody>${ids.map(cid=>{const c=S.customers[cid],p=pp[cid]||{};return `<tr data-c="${cid}"><td>${esc(custLabel(c))}</td><td><span class="pill ptype">${paxType(c,st)}</span></td>${['base','tax','fee','sell'].map(k=>`<td data-l="${{base:'מחיר בסיס',tax:'מיסים',fee:'דמי שירות',sell:'מחיר מכירה'}[k]}"><input type="number" step="any" name="${k}" value="${esc(p[k]??'')}" aria-label="${k}"></td>`).join('')}</tr>`}).join('')}</tbody></table><button class="btn sm" type="button" id="ppCopy" style="margin-top:6px">העתקת השורה הראשונה מכל סוג לשאר הנוסעים מאותו סוג</button>`:'<div class="muted small">מסמנים נוסעים בשירות כדי לתמחר כל אחד.</div>';
     const cp=$('#ppCopy');if(cp)cp.onclick=()=>{readPP();const first={};document.querySelectorAll('#ppBox tr[data-c]').forEach(tr=>{const t=tr.querySelector('.ptype').textContent;if(!first[t])first[t]=pp[tr.dataset.c];else pp[tr.dataset.c]={...first[t]}});drawPP();calc()};
   };
   const cur=()=>{readPP();const o=readFields(F_SVC_P,$('#frm'))||{};return {...o,perPax:$('#perPax').checked,paxPrices:pp,paxIds:selPax()}};
