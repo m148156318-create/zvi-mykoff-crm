@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ZVI MYKOFF CRM</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1f6fae">
+<meta name="theme-color" content="#0f1a2e">
 <link rel="icon" href="icons/icon-192.png?v=gold">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=gold">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ZVI MYKOFF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   /* layout: menu rail (right) | work area | widgets column (left), like the agency back-office */
@@ -483,6 +483,74 @@ span.num.ltr{white-space:nowrap}
   .board{grid-template-columns:repeat(5,80vw)}
 }
 @media (max-width:420px){.form,.form.three{grid-template-columns:1fr}.svc-btn{min-width:calc(33% - 6px)}}
+
+/* ===== 2026 refresh ===== */
+:root{--bg:#f3f4f7;--surface:#fff;--surface-2:#f6f7fa;--ink:#0e1525;--muted:#5f6a7d;--line:#e3e6ed;
+  --accent:#2a5bd7;--accent-ink:#fff;--accent-soft:#e8eefc;--panel:#0f1a2e;--panel-2:#1d2c4a;--gold:#c8963e;
+  --font-display:"Heebo","Assistant",system-ui,sans-serif;--font-body:"Heebo","Assistant",system-ui,"Segoe UI",Arial,sans-serif;--radius:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0f17;--surface:#121826;--surface-2:#171f30;--ink:#e8ecf3;--muted:#97a1b4;--line:#242e42;--accent:#7b9dff;--accent-ink:#0b0f17;--accent-soft:#1b2643;--panel:#0d1424;--panel-2:#1b2740;--gold:#e0b45a}}
+:root[data-theme="dark"]{--bg:#0b0f17;--surface:#121826;--surface-2:#171f30;--ink:#e8ecf3;--muted:#97a1b4;--line:#242e42;--accent:#7b9dff;--accent-ink:#0b0f17;--accent-soft:#1b2643;--panel:#0d1424;--panel-2:#1b2740;--gold:#e0b45a}
+body{background:var(--bg);font-size:14.5px;letter-spacing:-.005em;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-weight:700;letter-spacing:-.01em}
+.card,.tile,.tbl,.wg,.dk-bar,.nwin,.svc-tool,.sv-card{border-color:var(--line);box-shadow:0 1px 2px rgba(16,24,40,.04),0 4px 14px rgba(16,24,40,.04)}
+.card,.tile,.tbl,.nwin,.wg{border-radius:16px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border-radius:10px;transition:background .15s,border-color .15s,box-shadow .15s,transform .1s}
+.btn:active{transform:translateY(1px)}
+.btn.pri{box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 28%,transparent)}
+input,select,textarea{transition:border-color .15s,box-shadow .15s}
+.form input:focus,.form select:focus,.form textarea:focus,.fbody input:focus,.fbody select:focus,.colf input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent);background:var(--surface)}
+/* top bar: ink with a gold glow, brand colours */
+.appbar{background:radial-gradient(420px 160px at 12% 0%,color-mix(in srgb,var(--gold) 30%,transparent),transparent 70%),linear-gradient(120deg,var(--panel),var(--panel-2));box-shadow:0 12px 30px rgba(15,26,46,.22);border:1px solid rgba(255,255,255,.06)}
+.appbar::after{opacity:.5}
+.hello b{font-weight:800;font-size:20px}
+.appbar .search input{border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.appbar .btn{border-radius:12px}
+.appbar .btn.pri{background:var(--gold);border-color:var(--gold);color:#14100a;box-shadow:0 6px 16px color-mix(in srgb,var(--gold) 35%,transparent)}
+/* menu rail */
+.rail{background:var(--surface);border-inline-end:0;border-inline-start:1px solid var(--line)}
+.brand b{font-weight:800;letter-spacing:.08em}
+.nav a{border-radius:10px;padding:10px 12px;font-weight:600;color:var(--muted)}
+.nav a:hover{background:var(--surface-2);color:var(--ink)}
+.nav a.on{background:var(--accent-soft);color:var(--accent)}
+.nav a.on::before{display:none}
+.nav .new{background:linear-gradient(120deg,var(--panel),var(--panel-2));color:var(--gold);border-radius:12px;box-shadow:0 8px 18px rgba(15,26,46,.22);font-weight:700}
+.nav .new:hover{background:linear-gradient(120deg,var(--panel-2),var(--panel))}
+.themeBtn{display:flex;align-items:center;gap:8px;width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:7px 10px;cursor:pointer;font-weight:600;color:var(--muted);margin-bottom:8px;font-size:13px}
+.themeBtn:hover{color:var(--ink);border-color:var(--accent)}
+/* widgets column */
+.widgets{background:var(--surface-2)}
+.wg{background:var(--surface)}
+/* tiles */
+.tile{border-top:0;border-radius:16px;padding:16px 18px 16px 60px}
+.tile .v{font-weight:800;letter-spacing:-.02em}
+.tile.go:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(16,24,40,.09)}
+/* tables */
+th{background:transparent;color:var(--muted);font-size:11.5px;letter-spacing:.02em}
+.ngrid th{color:var(--muted);background:var(--surface-2)}
+.tbl tbody tr:nth-child(even){background:transparent}
+tbody tr{transition:background .12s}
+.tbl tbody tr:hover,.ngrid tbody tr:hover{background:var(--accent-soft)}
+.ngrid .dkno,b.dkno{color:#13824a}
+:root[data-theme="dark"] .ngrid .dkno,:root[data-theme="dark"] b.dkno{color:#4fd38f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ngrid .dkno,:root:not([data-theme="light"]) b.dkno{color:#4fd38f}}
+.pill{border-radius:999px;font-weight:700}
+/* windows & panels */
+.nbar{background:linear-gradient(120deg,var(--panel),var(--panel-2));padding:10px 14px}
+.nbar.blue{background:linear-gradient(120deg,var(--accent),color-mix(in srgb,var(--accent) 70%,#7b4dff))}
+.dk-side{background:radial-gradient(300px 160px at 90% 0%,color-mix(in srgb,var(--gold) 22%,transparent),transparent 70%),linear-gradient(170deg,var(--panel),var(--panel-2));box-shadow:0 14px 30px rgba(15,26,46,.25)}
+.dk-no{color:var(--gold);background:rgba(255,255,255,.06);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);letter-spacing:.06em}
+.dk-acts button,.dk-acts label{border-radius:10px}
+.svc-tool{padding:8px}
+.svc-tool button{border-radius:12px}
+.svc-tool button:hover{transform:translateY(-1px)}
+.ntabs.big{background:transparent}
+.modal{border-radius:20px}
+.sv-top{border-radius:14px}
+.dk-totals div{border-radius:14px}
+@media (max-width:760px){.themeBtn{display:none}}
+:root[data-theme="dark"] .nbar.blue{background:linear-gradient(120deg,#2b4fb8,#4a3aa8)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nbar.blue{background:linear-gradient(120deg,#2b4fb8,#4a3aa8)}}
 </style>
 </head>
 <body>
@@ -493,7 +561,7 @@ span.num.ltr{white-space:nowrap}
       <div><b>ZVI MYKOFF</b><span>ניהול נסיעות</span></div>
     </div>
     <nav class="nav" id="nav"></nav>
-    <div class="rail-foot"><div id="who"></div><div id="saveState">מתחבר…</div></div>
+    <div class="rail-foot"><button class="themeBtn" data-act="toggleTheme" id="themeBtn"></button><div id="who"></div><div id="saveState">מתחבר…</div></div>
   </aside>
   <main class="main">
     <div class="appbar">
@@ -603,6 +671,9 @@ const NAV=[['home','ראשי','M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 
 const KINDS=['customers','suppliers','dockets','payments','leads','debts','files'];
 const S={customers:{},suppliers:{},dockets:{},payments:{},leads:{},debts:{},files:{},meta:{}};
 let backend=null, loadState='loading', unsubs=[];
+const THEMES=[['auto','מצב תצוגה: אוטומטי','M12 3a9 9 0 1 0 0 18zM12 3a9 9 0 0 1 0 18'],['light','מצב תצוגה: בהיר','M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'],['dark','מצב תצוגה: כהה','M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z']];
+function applyTheme(){let t='auto';try{t=localStorage.getItem('zm-theme')||'auto'}catch(e){}if(t==='auto')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;const b=document.getElementById('themeBtn');if(b){const x=THEMES.find(y=>y[0]===t)||THEMES[0];b.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="${x[2]}"/></svg>${x[1]}`}}
+applyTheme();
 const ui={flightDate:todayISO(),calMonth:todayISO().slice(0,7),dkFilter:'open',ldType:'all'};
 
 /* ---------- money ---------- */
@@ -1789,6 +1860,7 @@ const A={
   newDebt:()=>debtForm(),editDebt:d=>debtForm(d.id),openDebt:d=>openDebt(d.id),debtPay:d=>debtPayForm(d.id),
   del:async d=>{if(await confirmBox('למחוק את הרשומה?','מחיקה'))removeRec(d.k,d.id)},
   dkFilter:d=>{ui.dkFilter=d.v;renderAll()},
+  toggleTheme:()=>{let t='auto';try{t=localStorage.getItem('zm-theme')||'auto'}catch(e){}const n=THEMES[(THEMES.findIndex(y=>y[0]===t)+1)%3][0];try{localStorage.setItem('zm-theme',n)}catch(e){}applyTheme()},
   dkClear:()=>{ui.dq={};ui.dkFilter='all';renderAll()},
   dkExcel:()=>csvDownload('דוקטים.csv',[['דוקט','נפתח','התחלה','סיום','נוסעים','כותרת','מטבע','מכירות','עלות','רווח','שולם','יתרת לקוח','סטטוס'],...dkList().map(d=>{const k=dCalc(d),r=dRange(d);return [d.number,d.openDate,r.start,r.end,(d.passengers||[]).length,d.title,k.cur,r2(k.sales),r2(k.cost),r2(k.profit),r2(k.rec),r2(k.bal),d.status==='closed'?'נעול':'פתוח']})]),
   custExcel:()=>csvDownload('לקוחות.csv',[['תואר','שם משפחה','שם פרטי','שם בעברית','ת.ז.','תאריך לידה','דרכון','תוקף דרכון','טלפון','אימייל'],...vals('customers').map(c=>[c.title,c.lastName,c.firstName,c.nameHe,c.idNum,c.dob,c.passportNo,c.passportExp,c.phone,c.email])]),
